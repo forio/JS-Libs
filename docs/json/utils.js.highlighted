@@ -1,0 +1,495 @@
+<div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> *  Utility functions</span>
+<span class="cm"> *  @module Utils</span>
+<span class="cm"> */</span>
+ 
+<span class="cm">/**</span>
+<span class="cm"> *  @class </span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>  
+<span class="kd">var</span> <span class="nx">F</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+	<span class="c1">//Utility fn used by type checkers</span>
+	<span class="kd">function</span> <span class="nx">is</span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">testFn</span><span class="p">){</span>
+		<span class="nx">testFn</span> <span class="o">||</span> <span class="p">(</span><span class="nx">testFn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">o</span><span class="p">){</span><span class="k">return</span>  <span class="k">typeof</span> <span class="nx">o</span> <span class="o">===</span> <span class="nx">type</span><span class="p">;})</span>
+
+		<span class="kd">var</span> <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">args</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">testFn</span><span class="p">(</span><span class="nx">args</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="o">!==</span> <span class="kc">true</span><span class="p">){</span>
+				<span class="nx">isValid</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">isValid</span><span class="p">;</span>
+	<span class="p">}</span>
+	
+	<span class="cm">/* @param {HTMLElement| String} Decision element or &quot;name = value&quot; string</span>
+<span class="cm">	 * @param {String} suffix to attach to the decision name; e.g. &quot;initial value&quot; gets the reset val</span>
+<span class="cm">	 * @return {String} Obj.quanitfiedDName = value;</span>
+<span class="cm">	 */</span> 
+	<span class="kd">function</span> <span class="nx">_quantifyParamName</span><span class="p">(</span><span class="nx">param</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">param</span> <span class="o">||</span> <span class="nx">F</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span><span class="nx">param</span><span class="p">))</span> <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">settings</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">prefix</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+			<span class="nx">suffix</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+			<span class="nx">mappingFn</span><span class="o">:</span> <span class="kc">null</span>
+		<span class="p">}</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">settings</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		
+		<span class="kd">var</span> <span class="nx">pName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> 
+		<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isElement</span><span class="p">(</span><span class="nx">param</span><span class="p">)){</span>
+			<span class="nx">pName</span> <span class="o">=</span> <span class="nx">param</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+			<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">pName</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Error parsing decision name: Element does not have &#39;name&#39; property.&quot;</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">param</span><span class="p">)){</span>
+			<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="nx">param</span><span class="p">){</span> 
+				<span class="c1">//Assume object has only 1 property. If it has more ignore and just take the longest one. Should i throw an error?</span>
+				<span class="nx">pName</span> <span class="o">=</span> <span class="nx">prop</span><span class="p">;</span> 
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">param</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">param</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span> <span class="o">!==</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+			<span class="nx">pName</span> <span class="o">=</span> <span class="nx">param</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="nx">pName</span> <span class="o">=</span> <span class="nx">param</span><span class="p">;</span>
+		<span class="p">}</span>
+		
+		<span class="k">if</span><span class="p">(</span><span class="nx">settings</span><span class="p">.</span><span class="nx">mappingFn</span><span class="p">){</span>
+			<span class="nx">pName</span> <span class="o">=</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">mappingFn</span><span class="p">(</span><span class="nx">pName</span><span class="p">);</span>
+		<span class="p">}</span>
+		
+		<span class="c1">//Add prefix if it&#39;s not already there</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">pName</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">prefix</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">!==</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">prefix</span><span class="p">){</span>
+			<span class="nx">pName</span> <span class="o">=</span> <span class="nx">settings</span><span class="p">.</span><span class="nx">prefix</span> <span class="o">+</span> <span class="nx">pName</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">pName</span><span class="p">;</span>
+	<span class="p">}</span>
+	
+	<span class="kd">function</span> <span class="nx">_getParamValue</span><span class="p">(</span><span class="nx">param</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">pVal</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isElement</span><span class="p">(</span><span class="nx">param</span><span class="p">)){</span>
+			<span class="nx">pVal</span> <span class="o">=</span> <span class="nx">param</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span> 
+			<span class="k">if</span><span class="p">(</span><span class="nx">pVal</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Error parsing decision value: Element does not have &#39;value&#39; property.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">param</span><span class="p">)){</span>
+			<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="nx">param</span><span class="p">){</span>
+				<span class="nx">pVal</span> <span class="o">=</span> <span class="nx">param</span><span class="p">[</span><span class="nx">prop</span><span class="p">];</span> 
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">param</span><span class="p">)){</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">param</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Error parsing decision value: String should be in &#39;name=value&#39; format&quot;</span><span class="p">);</span>
+			<span class="nx">pVal</span> <span class="o">=</span> <span class="nx">param</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">];</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Unknown Input Format&quot;</span><span class="p">);</span> 
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">pVal</span><span class="p">);</span>
+	<span class="p">}</span>
+	
+	<span class="cm">/* @param paramList {*}</span>
+<span class="cm">	 * @param type {String} &#39;string&#39; or &#39;object&#39;</span>
+<span class="cm">	 */</span>
+	<span class="kd">function</span> <span class="nx">make</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+  	 	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">paramList</span> <span class="o">||</span> <span class="nx">F</span><span class="p">.</span><span class="nx">isEmpty</span><span class="p">(</span><span class="nx">paramList</span><span class="p">))</span> <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+  	 	<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span><span class="p">{</span>
+  	 		<span class="nx">seperator</span> <span class="o">:</span> <span class="s2">&quot;=&quot;</span><span class="p">,</span>
+  	 		<span class="nx">encode</span><span class="o">:</span> <span class="kc">true</span>
+  	 	<span class="p">}</span>
+  	 	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+  	 	
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">paramList</span><span class="p">)){</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isElement</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="s2">&quot;form&quot;</span><span class="p">)){</span>
+				<span class="nx">paramList</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">paramList</span><span class="p">).</span><span class="nx">serialize</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isElement</span><span class="p">(</span><span class="nx">paramList</span><span class="p">)){</span>
+				<span class="nx">paramList</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">paramList</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">paramList</span><span class="p">)){</span>
+				<span class="nx">paramList</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">toArray</span><span class="p">(</span><span class="nx">paramList</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">paramList</span><span class="p">)){</span>
+				<span class="nx">paramList</span> <span class="o">=</span> <span class="nx">paramList</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">else</span><span class="p">{</span>
+				<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;make: cannot identify input type&quot;</span><span class="p">);</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="c1">//Copy array or the recursion destroys it. Interesting</span>
+			<span class="nx">paramList</span> <span class="o">=</span> <span class="nx">paramList</span><span class="p">.</span><span class="nx">slice</span><span class="p">();</span>
+		<span class="p">}</span>
+		
+		<span class="kd">var</span> <span class="nx">makeParam</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">decision</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">pName</span> <span class="o">=</span> <span class="nx">_quantifyParamName</span><span class="p">(</span><span class="nx">decision</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="kd">var</span> <span class="nx">pVal</span> <span class="o">=</span>  <span class="nx">_getParamValue</span><span class="p">(</span><span class="nx">decision</span><span class="p">);</span>
+			
+			<span class="kd">var</span> <span class="nx">param</span><span class="p">;</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">tempParam</span> <span class="o">=</span> <span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">encode</span><span class="p">)</span> <span class="o">?</span> <span class="p">[</span><span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">pName</span><span class="p">),</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">pVal</span><span class="p">)]</span> <span class="o">:</span> <span class="p">[</span><span class="nx">pName</span><span class="p">,</span> <span class="nx">pVal</span><span class="p">];</span>
+				<span class="nx">param</span><span class="o">=</span> <span class="nx">tempParam</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">seperator</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">else</span><span class="p">{</span>
+				<span class="nx">param</span> <span class="o">=</span> <span class="p">{};</span> 
+				<span class="nx">param</span><span class="p">[</span><span class="nx">pName</span><span class="p">]</span> <span class="o">=</span> <span class="nx">pVal</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">return</span> <span class="nx">param</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="kd">var</span> <span class="nx">combineParams</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span> <span class="p">(</span><span class="nx">type</span> <span class="o">===</span> <span class="s2">&quot;object&quot;</span><span class="p">)</span> <span class="o">?</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">)</span> <span class="o">:</span> <span class="nx">arg1</span> <span class="o">+</span> <span class="s2">&quot;&amp;&quot;</span> <span class="o">+</span> <span class="nx">arg2</span> <span class="p">;</span> <span class="c1">//TODO: Replace extend by combine Qs later</span>
+			<span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
+		<span class="p">}</span>
+		
+		<span class="kd">var</span> <span class="nx">qs</span><span class="p">;</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">paramList</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">1</span><span class="p">){</span>
+			<span class="nx">qs</span> <span class="o">=</span> <span class="nx">makeParam</span><span class="p">(</span><span class="nx">paramList</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">top</span> <span class="o">=</span> <span class="nx">paramList</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
+			<span class="nx">qs</span> <span class="o">=</span>  <span class="nx">combineParams</span><span class="p">(</span><span class="nx">make</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span><span class="nx">type</span><span class="p">,</span> <span class="nx">options</span><span class="p">),</span> <span class="nx">makeParam</span><span class="p">(</span><span class="nx">top</span><span class="p">));</span> <span class="c1">//recursion w00t</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">qs</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Check if inputs are strings; fails if any of the params aren&#39;t</span>
+<span class="cm">		 * @param {String} Pass in as many inputs you want to check</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isString</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="nx">is</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s2">&quot;string&quot;</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if inputs are numbers; fails if any of the params aren&#39;t</span>
+<span class="cm">		 * @param {String} Pass in as many inputs you want to check</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isNumber</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="nx">is</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if inputs are arrays; fails if any of the params aren&#39;t</span>
+<span class="cm">		 * @uses $.isArray</span>
+<span class="cm">		 * @param {String} Pass in as many inputs you want to check</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isArray</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="nx">is</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isArray</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if inputs are strings; fails if any of the params aren&#39;t</span>
+<span class="cm">		 * Does NOT return true for objects created with new keyword or anything but obj literals</span>
+<span class="cm">		 * @uses $.isPlainObject</span>
+<span class="cm">		 * @param {String} Pass in as many inputs you want to check</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isObject</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="nx">is</span><span class="p">(</span><span class="nx">arguments</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="nx">$</span><span class="p">.</span><span class="nx">isPlainObject</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if inputs is HTMLElement</span>
+<span class="cm">		 * @param {*} o Item to check</span>
+<span class="cm">		 * @param {String} type pass in type to add an additional level of constraint checking; defaults to &#39;any&#39;</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isElement</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">o</span><span class="p">,</span> <span class="nx">type</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">o</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">nodeName</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="nx">type</span> <span class="o">||</span> <span class="nx">o</span><span class="p">.</span><span class="nx">nodeName</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span> <span class="o">===</span> <span class="nx">type</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">())){</span>
+				<span class="nx">isValid</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+			<span class="p">}</span>
+			<span class="k">return</span> <span class="nx">isValid</span><span class="p">;</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if inputs is &#39;emtpy&#39;, as opposed to undefined; i.e blank strings, empty objects, 0 elem arrays</span>
+<span class="cm">		 * @param {*} 0 input to check</span>
+<span class="cm">		 * @return {Boolean}</span>
+<span class="cm">		 */</span>
+		<span class="nx">isEmpty</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">o</span><span class="p">){</span>
+			<span class="k">return</span> <span class="p">(</span><span class="nx">o</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span> <span class="o">||</span> <span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">$</span><span class="p">.</span><span class="nx">isEmptyObject</span><span class="p">(</span><span class="nx">o</span><span class="p">))</span> <span class="o">||</span> <span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">length</span> <span class="o">!==</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">));</span>
+		<span class="p">},</span>
+		
+		 <span class="cm">/** Converts anything to an object literal</span>
+<span class="cm">		 * @param {String||HTMLElement||Object||Array} paramList input to convert</span>
+<span class="cm">		 * @param {Object} options @see makeQueryString</span>
+<span class="cm">		 * @return {Object}</span>
+<span class="cm">		 */</span>
+		<span class="nx">makeObject</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span> 
+			<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">paramList</span><span class="p">)){</span>
+				<span class="k">return</span> <span class="nx">paramList</span><span class="p">;</span>
+			<span class="p">}</span>
+	    	<span class="k">return</span> <span class="nx">make</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+	    <span class="p">},</span>
+	    
+	    <span class="cm">/** Converts anything to a url-ready string</span>
+<span class="cm">	     * @param {String||HTMLElement||Object||Array||Mixed} paramList input to convert</span>
+<span class="cm">	     * @param {Object} options </span>
+<span class="cm">	     * @config {String} prefix D_ or something to append to every item in the list. Doesnt add if already there</span>
+<span class="cm">		 * @config {String} suffix If string has [, inserts it before that.</span>
+<span class="cm">		 * @config {String} seperator  character between parameter name and value; defaults to &quot;=&quot;, but u can use &quot;:&quot; instead</span>
+<span class="cm">		 * @config {Boolean} encode specify if you want to urlEncode the parameter and the value (NOT the whole string). Defaults to yes</span>
+<span class="cm">		 * @return {String} querystring</span>
+<span class="cm">		 */</span>
+	    <span class="nx">makeQueryString</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="k">return</span> <span class="nx">make</span><span class="p">(</span><span class="nx">paramList</span><span class="p">,</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+	    <span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}()</span>
+
+<span class="cm">/** Stringy functions</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class String</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nb">String</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/** Compares strings (or numbers) regardless of case</span>
+<span class="cm">	 * @param {String} str1 </span>
+<span class="cm">	 * @param {String} str2 the strings to check</span>
+<span class="cm">	 * @return {Boolean} flag set to true if they&#39;re equal</span>
+<span class="cm">	 */</span>
+	<span class="nx">equalsIgnoreCase</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">str1</span><span class="p">,</span> <span class="nx">str2</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">str1</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">str2</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;F.String.equalsIgnoreCase: Inputs are undefined&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+		 <span class="nx">str1</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">((</span><span class="nx">str1</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="p">).</span><span class="nx">toLowerCase</span><span class="p">());</span>
+  		 <span class="nx">str2</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">((</span><span class="nx">str2</span> <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="p">).</span><span class="nx">toLowerCase</span><span class="p">());</span>
+  		 <span class="k">return</span> <span class="nx">str1</span> <span class="o">===</span> <span class="nx">str2</span><span class="p">;</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Strips tabs, carriage returns and empty lines from a string.</span>
+<span class="cm">	 * @param {String} ipString The string to clean</span>
+<span class="cm">	 * @return {String} the &#39;clean&#39; string</span>
+<span class="cm">	 */</span>
+	<span class="nx">clean</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipString</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">ipString</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;String.clean: &quot;</span> <span class="o">+</span> <span class="nx">ipString</span> <span class="o">+</span> <span class="s2">&quot; is not a String.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">ipString</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\/t/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\r/g</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)).</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Tests a string for blank/ maxLength. Useful for input validations. </span>
+<span class="cm">	 * @param {String} ipString the string to validate</span>
+<span class="cm">	 * @param {Object} settings </span>
+<span class="cm">	 * @return {Boolean} true if string is valid</span>
+<span class="cm">	 */</span>
+	<span class="nx">isValid</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipstring</span><span class="p">,</span> <span class="nx">settings</span><span class="p">){</span>
+	    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">ipstring</span><span class="p">)){</span>
+	        <span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;String.isValid: input is not a String.&quot;</span><span class="p">);</span>
+	    <span class="p">}</span>
+	    <span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+	        <span class="nx">allowNull</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+	        <span class="nx">maxLength</span><span class="o">:</span> <span class="mi">200</span><span class="p">,</span>
+	        <span class="nx">pattern</span><span class="o">:</span> <span class="kc">false</span>
+	    <span class="p">}</span>
+	    <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
+	    <span class="kd">var</span> <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+	    
+	    <span class="k">if</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">allowNull</span> <span class="o">===</span> <span class="kc">false</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">!</span><span class="nx">ipstring</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">ipstring</span><span class="p">)</span> <span class="o">===</span> <span class="s2">&quot;&quot;</span><span class="p">)){</span>
+	        <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	    <span class="p">}</span>
+	    
+	    <span class="k">if</span><span class="p">(</span><span class="nx">ipstring</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">maxLength</span><span class="p">){</span>
+	       <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	    <span class="p">}</span>
+	    
+	    <span class="k">if</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">pattern</span><span class="p">){</span>
+	    	<span class="kd">var</span> <span class="nx">regexPattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">pattern</span><span class="p">);</span>
+	    	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">regexPattern</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">ipstring</span><span class="p">)){</span>
+                <span class="nx">isValid</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+	    <span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">isValid</span><span class="p">;</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Checks if string is a valid email address</span>
+<span class="cm">	 * @extends isValid</span>
+<span class="cm">	 * @param {String} ipString</span>
+<span class="cm">	 * @param {Object} settings @see isValid for options</span>
+<span class="cm">	 * @return {Boolean} true if email is valid</span>
+<span class="cm">	 * </span>
+<span class="cm">	 */</span>
+	<span class="nx">isValidEmail</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipString</span><span class="p">,</span> <span class="nx">settings</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">emailRegex</span> <span class="o">=</span> <span class="sr">/^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">defaults</span>  <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">settings</span><span class="p">,</span> <span class="p">{</span><span class="nx">pattern</span><span class="o">:</span> <span class="nx">emailRegex</span><span class="p">});</span>
+		<span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isValid</span><span class="p">(</span><span class="nx">ipString</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/** XML utility functions</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class XML</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">XML</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/** Converts XML/ Dom list to string</span>
+<span class="cm">	 * @param {XML} node</span>
+<span class="cm">	 * @return {String}</span>
+<span class="cm">	 */</span>
+	<span class="nx">toString</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">XMLSerializer</span> <span class="o">!=</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="c1">//Ffox</span>
+			<span class="k">return</span> <span class="p">(</span><span class="k">new</span> <span class="nx">XMLSerializer</span><span class="p">()).</span><span class="nx">serializeToString</span><span class="p">(</span><span class="nx">node</span><span class="p">);</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">xml</span><span class="p">)</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="nx">node</span><span class="p">.</span><span class="nx">xml</span><span class="p">;</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/** Array utility functions</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Array</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nb">Array</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/** Max of elements in array</span>
+<span class="cm">	 * @param {Array} ipArray input array</span>
+<span class="cm">	 * @return {Number} max element in array</span>
+<span class="cm">	 */</span>
+	<span class="nx">max</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Array.max: input is not an array.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+	    <span class="kd">var</span> <span class="nx">max</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+	    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">max</span><span class="p">){</span>
+	    	<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">max</span> <span class="o">+</span> <span class="s2">&quot;is not a number&quot;</span><span class="p">);</span>
+	    <span class="p">}</span>
+	    <span class="kd">var</span> <span class="nx">currentItem</span><span class="p">;</span>
+	    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">ipArray</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+	        <span class="kd">var</span> <span class="nx">currentItem</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+	        <span class="k">if</span> <span class="p">(</span><span class="nx">max</span> <span class="o">&lt;</span> <span class="nx">currentItem</span><span class="p">)</span>      <span class="nx">max</span> <span class="o">=</span> <span class="nx">currentItem</span><span class="p">;</span>
+	    <span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">max</span><span class="p">;</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Min of elements in array</span>
+<span class="cm">	 * @param {Array} ipArray input array</span>
+<span class="cm">	 * @return {Number} min element in array</span>
+<span class="cm">	 */</span>
+	<span class="nx">min</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Array.min: input is not an array.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+	    <span class="kd">var</span> <span class="nx">min</span> <span class="o">=</span>  <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+	    <span class="kd">var</span> <span class="nx">currentItem</span><span class="p">;</span>
+	    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">ipArray</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+	        <span class="nx">currentItem</span> <span class="o">=</span>  <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+	        <span class="k">if</span> <span class="p">(</span><span class="nx">min</span> <span class="o">&gt;</span> <span class="nx">currentItem</span><span class="p">)</span> <span class="nx">min</span> <span class="o">=</span> <span class="nx">currentItem</span><span class="p">;</span>
+	    <span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">min</span><span class="p">;</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Checks if item is in array</span>
+<span class="cm">	 * @param {value} value to search for</span>
+<span class="cm">	 * @param {Array} ipArray input array</span>
+<span class="cm">	 * @return {Boolean} true if found</span>
+<span class="cm">	 */</span>
+	<span class="nx">contains</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">ipArray</span> <span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Array.contains: input is not an array.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+	    <span class="kd">var</span> <span class="nx">found</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>  <span class="nx">i</span><span class="o">&lt;</span> <span class="nx">ipArray</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+	        <span class="k">if</span><span class="p">(</span><span class="nx">value</span> <span class="o">===</span> <span class="nx">ipArray</span><span class="p">[</span><span class="nx">i</span><span class="p">]){</span>
+	            <span class="nx">found</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+	            <span class="k">break</span><span class="p">;</span>
+	        <span class="p">}</span>
+	    <span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">found</span><span class="p">;</span>
+	<span class="p">},</span>
+	<span class="cm">/** Non-destructive array copy</span>
+<span class="cm">	 * @param {Array} ipArray</span>
+<span class="cm">	 * @return {Array} copy of input</span>
+<span class="cm">	 */</span>
+	<span class="nx">copy</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">ipArray</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Array.copy: input is not an array.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">ipArray</span><span class="p">.</span><span class="nx">slice</span><span class="p">();</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/** Object utility functions</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Object</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nb">Object</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="nx">toArray</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">obj</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Object.toArray: input is not an Object.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+	 	<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="p">[];</span>
+	    <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="nx">obj</span><span class="p">){</span>
+	    	<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">])){</span>
+	    		<span class="kd">var</span> <span class="nx">paramArray</span> <span class="o">=</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">];</span>
+	    		<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">param</span> <span class="k">in</span> <span class="nx">paramArray</span><span class="p">){</span>
+	    			<span class="nx">qs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">prop</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nx">paramArray</span><span class="p">[</span><span class="nx">param</span><span class="p">]</span> <span class="p">)</span>
+	    		<span class="p">}</span>
+	    	<span class="p">}</span>
+	    	<span class="k">else</span><span class="p">{</span>
+	            <span class="nx">qs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">prop</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nx">obj</span><span class="p">[</span><span class="nx">prop</span><span class="p">]);</span>
+	    	<span class="p">}</span>
+	    <span class="p">}</span>
+	    <span class="k">return</span> <span class="nx">qs</span><span class="p">;</span>
+	<span class="p">},</span>
+	<span class="nx">toQueryString</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">obj</span><span class="p">)){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;Object.toQueryString: input is not an Object.&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">toArray</span><span class="p">(</span><span class="nx">obj</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">);</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/** Returns a stringified repn of the object</span>
+<span class="cm">	 * @requires YAHOO.lang.JSON</span>
+<span class="cm">	 * @param {Object| obj input object</span>
+<span class="cm">	 * @return{String} string repn of the object;</span>
+<span class="cm">	 */</span>
+	<span class="nx">serialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">obj</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">YAHOO</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">JSON</span><span class="p">){</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nx">TypeError</span><span class="p">(</span><span class="s2">&quot;JSON is undefined. Include json.js&quot;</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">return</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">obj</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+
+
+<span class="cm">/** Networking utilities</span>
+<span class="cm"> * @class Net</span>
+<span class="cm"> * @static</span>
+<span class="cm"> * @namespace F </span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">Net</span> <span class="o">=</span><span class="p">{</span>
+	<span class="cm">/** Combines two query strings;</span>
+<span class="cm">	 * @param {*} oldQs</span>
+<span class="cm">	 * @param {*} newQs</span>
+<span class="cm">	 * @param {Boolean} overwrite If true, combining a=b and a=c will return a=b&amp;a=c; else will return a=c</span>
+<span class="cm">	 * @return {String} combined querystring</span>
+<span class="cm">	 */</span>
+    <span class="nx">combineQueryStrings</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oldQs</span><span class="p">,</span> <span class="nx">newQs</span><span class="p">,</span> <span class="nx">overwrite</span><span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">oldObj</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">oldQs</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">newQs</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">overwrite</span><span class="p">){</span>
+            <span class="nx">oldObj</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">oldObj</span><span class="p">,</span> <span class="nx">newObj</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span><span class="p">{</span>
+            <span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">param</span> <span class="k">in</span> <span class="nx">newObj</span><span class="p">){</span>
+                <span class="k">if</span><span class="p">(</span><span class="nx">oldObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]</span> <span class="o">&amp;&amp;</span> <span class="nx">oldObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]</span> <span class="o">!==</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]){</span>
+                    <span class="kd">var</span> <span class="nx">oldVal</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">oldObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]);</span>
+                    <span class="kd">var</span> <span class="nx">newVal</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">newObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]);</span>
+                    <span class="nx">oldObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]</span> <span class="o">=</span> <span class="nx">oldVal</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">newVal</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">else</span><span class="p">{</span>
+                    <span class="nx">oldObj</span><span class="p">[</span><span class="nx">param</span><span class="p">]</span> <span class="o">=</span>  <span class="nx">newObj</span><span class="p">[</span><span class="nx">param</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">oldObj</span><span class="p">);</span>
+    <span class="p">},</span>
+  
+    <span class="cm">/** Changes the window location to the url</span>
+<span class="cm">     * @param {String} url</span>
+<span class="cm">     */</span>
+    <span class="nx">goToURL</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span> <span class="o">=</span> <span class="nx">url</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre></div>

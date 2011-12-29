@@ -1,0 +1,355 @@
+<div class="highlight"><pre><span class="cm">/** All utility classes and functions related to establishing Ajax connections</span>
+<span class="cm"> * @module Net</span>
+<span class="cm"> * @author Naren</span>
+<span class="cm"> */</span>
+
+<span class="cm">/** Use for all ajax-y stuff within simulations. Among other benefits, it re-tries connections on failure, does param parsing etc.</span>
+<span class="cm"> * @class AjaxConnection</span>
+<span class="cm"> * @namespace</span>
+<span class="cm"> * @constructor</span>
+<span class="cm"> * @param {String} url url to connect to</span>
+<span class="cm"> * @param {Object} settings Configuration options; see configs section below for values</span>
+<span class="cm"> * @param {Object} ajaxOptions default jQuery ajax options</span>
+<span class="cm"> * @return {}</span>
+<span class="cm"> */</span>
+<span class="kd">var</span> <span class="nx">AjaxConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">settings</span><span class="p">,</span> <span class="nx">ajaxOptions</span><span class="p">){</span>
+	<span class="nx">url</span> <span class="o">||</span> <span class="p">(</span><span class="nx">url</span> <span class="o">=</span> <span class="s2">&quot;include/data/empty.txt&quot;</span><span class="p">);</span> <span class="c1">//TODO: change to empty.txt on simulate later</span>
+	<span class="kd">var</span> <span class="nx">FATAL_CODES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">404</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">403</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">409</span><span class="p">];</span>
+	<span class="kd">var</span> <span class="nx">SUCCESS_CODES</span> <span class="o">=</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">];</span>
+	<span class="kd">var</span> <span class="nx">TIME_OUT</span> <span class="o">=</span> <span class="mi">401</span><span class="p">;</span>
+	
+	<span class="kd">var</span> <span class="nx">defaultSettings</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="cm">/** The no. of times to retry request before calling error handler</span>
+<span class="cm">		 * @config tries</span>
+<span class="cm">		 * @type Number</span>
+<span class="cm">		 * @default 2</span>
+<span class="cm">		 */</span>
+		<span class="nx">tries</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+		<span class="cm">/** If true, the call redirects to the login page on access denied errors; else it calls the error handlers</span>
+<span class="cm">		 * @config allowRedirect</span>
+<span class="cm">		 * @type Boolean</span>
+<span class="cm">		 * @default false</span>
+<span class="cm">		 */</span>
+		<span class="nx">allowRedirect</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+		<span class="cm">/** Time between reconnection attempts</span>
+<span class="cm">		 * @config reconnectInterval</span>
+<span class="cm">		 * @type Number</span>
+<span class="cm">		 * @default 2000</span>
+<span class="cm">		 */</span>
+		<span class="nx">reconnectInterval</span><span class="o">:</span> <span class="mi">2000</span><span class="p">,</span>
+		<span class="cm">/** Error handler. By default shows the error message in an alert, and logs to console if possible</span>
+<span class="cm">		 * @config onError</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">onError</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">errorMessage</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">em</span> <span class="o">=</span>  <span class="s2">&quot;AjaxConnection: Status &quot;</span> <span class="o">+</span> <span class="nx">errorMessage</span><span class="p">.</span><span class="nx">status</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span>  <span class="nx">errorMessage</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">errorThrown</span><span class="p">){</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">errorThrown</span><span class="p">.</span><span class="nx">name</span><span class="p">){</span> <span class="c1">//Error object</span>
+					<span class="nx">em</span> <span class="o">+=</span>  <span class="s2">&quot;  &quot;</span> <span class="o">+</span>  <span class="nx">errorThrown</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nx">errorThrown</span><span class="p">.</span><span class="nx">message</span> <span class="o">+</span> <span class="s2">&quot; at &quot;</span> <span class="o">+</span> <span class="nx">url</span><span class="p">;</span>
+					
+				<span class="p">}</span>
+				<span class="k">else</span><span class="p">{</span>
+					<span class="c1">//em += errorThrown;</span>
+					<span class="k">if</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">console</span> <span class="o">&amp;&amp;</span> <span class="nb">window</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">){</span>
+						<span class="nb">window</span><span class="p">.</span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">errorThrown</span><span class="p">);</span>
+						<span class="nx">em</span> <span class="o">+=</span> <span class="s2">&quot; .Logged to console.&quot;</span><span class="p">;</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+			<span class="nx">alert</span><span class="p">(</span><span class="nx">em</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="cm">/** Success handler. Called with response</span>
+<span class="cm">		 * @config onSuccess</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">onSuccess</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">,</span>
+		<span class="cm">/** Request termination handler; called regardless of success or failure</span>
+<span class="cm">		 * @config onComplete</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">onComplete</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">,</span>
+		<span class="cm">/** Run the query params through this function before posting it; use F.makeQueryString in most cases. TODO:// should i default to this?</span>
+<span class="cm">		 * @config parameterParser</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">parameterParser</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">param</span><span class="p">){</span>
+			<span class="k">return</span> <span class="nx">param</span><span class="p">;</span>
+		<span class="p">},</span>
+		<span class="cm">/** Connection not made till this function returns true; Used to remove swfs off page for ie, and maybe for validation before posting</span>
+<span class="cm">		 * @config preloadCondition</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">preloadCondition</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaultSettings</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">allowRedirect</span><span class="p">)</span> <span class="nx">url</span> <span class="o">+=</span> <span class="p">(</span><span class="nx">url</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">?</span> <span class="s2">&quot;?skip_redirect=true&quot;</span> <span class="o">:</span> <span class="s2">&quot;&amp;skip_redirect=true&quot;</span><span class="p">;</span>
+	
+	<span class="c1">//jQuery ajax settings</span>
+	<span class="kd">var</span> <span class="nx">connSettings</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+		<span class="nx">cache</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+		<span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+		<span class="nx">data</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+		<span class="nx">processData</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> 
+		<span class="nx">error</span><span class="o">:</span> <span class="nx">handleError</span><span class="p">,</span>
+		<span class="nx">success</span><span class="o">:</span> <span class="nx">handleSuccess</span><span class="p">,</span>
+		<span class="nx">url</span><span class="o">:</span> <span class="nx">url</span>
+	<span class="p">};</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">,</span> <span class="nx">ajaxOptions</span><span class="p">);</span>
+	
+	<span class="kd">function</span> <span class="nx">_error</span><span class="p">(</span><span class="nx">XMLHttpRequestObj</span><span class="p">,</span>  <span class="nx">errorText</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">XMLHttpRequestObj</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span><span class="c1">//simulate returns string, http returns int;</span>
+		<span class="kd">var</span> <span class="nx">errorText</span> <span class="o">=</span> <span class="nx">XMLHttpRequestObj</span><span class="p">.</span><span class="nx">statusText</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">responseText</span> <span class="o">=</span> <span class="nx">XMLHttpRequestObj</span><span class="p">.</span><span class="nx">responseText</span><span class="p">;</span>
+		
+		
+		<span class="kd">var</span> <span class="nx">isFatalError</span>  <span class="o">=</span> <span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nb">Array</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">FATAL_CODES</span><span class="p">)</span> <span class="o">||</span> <span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">tries</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">);</span>
+		<span class="kd">var</span> <span class="nx">isTimeOutError</span> <span class="o">=</span> <span class="p">(</span><span class="nx">status</span> <span class="o">===</span> <span class="nx">TIME_OUT</span><span class="p">);</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">isTimeOutError</span> <span class="o">||</span> <span class="nx">isFatalError</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">errorMessage</span> <span class="o">=</span> <span class="p">{</span><span class="nx">status</span><span class="o">:</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">message</span><span class="o">:</span> <span class="nx">errorText</span><span class="p">};</span>
+			<span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">onError</span><span class="p">(</span><span class="nx">errorMessage</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">);</span>
+			<span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">onComplete</span><span class="p">(</span><span class="nx">responseText</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="c1">//Unknown error</span>
+			<span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">tries</span><span class="o">--</span> <span class="p">;</span>
+			<span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">)},</span> <span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">reconnectInterval</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span> 
+	
+	<span class="c1">//Connection error</span>
+	<span class="kd">function</span> <span class="nx">handleError</span><span class="p">(</span><span class="nx">XMLHttpRequest</span><span class="p">,</span> <span class="nx">textStatus</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">){</span> 
+		<span class="nx">_error</span><span class="p">(</span> <span class="nx">XMLHttpRequest</span><span class="p">,</span> <span class="nx">errorThrown</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">//If you do skip_redirect, the request returns fine but has the status code in it. Check if that code has an error</span>
+	<span class="kd">function</span> <span class="nx">handleSuccess</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">callback</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+			<span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">onSuccess</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+			<span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">onComplete</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+		<span class="p">}</span>
+		
+		<span class="k">try</span><span class="p">{</span><span class="c1">//Check if response has error code in it </span>
+			<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">response</span><span class="p">))</span> <span class="o">?</span> <span class="nx">response</span> <span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">parseJSON</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span> <span class="c1">//response may already be JSON parsed</span>
+			<span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">?</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">status_code</span><span class="p">)</span> <span class="o">:</span> <span class="mi">0</span><span class="p">;</span>
+			
+			<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">status</span> <span class="o">||</span> <span class="nx">F</span><span class="p">.</span><span class="nb">Array</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">SUCCESS_CODES</span><span class="p">)){</span>
+			 	<span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span> <span class="c1">//No known errors, pass it on</span>
+			<span class="p">}</span>
+			<span class="k">else</span><span class="p">{</span>
+				<span class="nx">_error</span><span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+		 	<span class="nx">callback</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span> <span class="c1">//Not a json response, pass it on</span>
+		<span class="p">}</span> 
+	<span class="p">}</span>
+	 
+	<span class="kd">function</span> <span class="nx">connect</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">){</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">callback</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="nx">callback</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span> <span class="c1">//nulls don&#39;t play well with jquery extend</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaultSettings</span><span class="p">,</span> <span class="p">{</span><span class="nx">onSuccess</span> <span class="o">:</span> <span class="nx">callback</span><span class="p">});</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		
+		<span class="nx">connSettings</span><span class="p">.</span><span class="nx">data</span> <span class="o">=</span> <span class="p">(</span><span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">parameterParser</span><span class="p">)</span> 
+			<span class="o">?</span> <span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">parameterParser</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">.</span><span class="nx">data</span><span class="p">)</span>
+			<span class="o">:</span> <span class="nx">connSettings</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+		
+		<span class="kd">var</span> <span class="nx">preLoadFn</span> <span class="o">=</span> <span class="nx">defaultSettings</span><span class="p">.</span><span class="nx">preloadCondition</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">timeBetweenTries</span> <span class="o">=</span> <span class="mi">500</span><span class="p">;</span>
+		
+		<span class="kd">var</span> <span class="nx">timer</span><span class="p">;</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">preLoadFn</span><span class="p">()</span> <span class="o">!==</span> <span class="kc">true</span><span class="p">){</span> <span class="c1">//Default fn returns true;</span>
+			<span class="nx">timer</span> <span class="o">=</span> <span class="nx">setInterval</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">preLoadFn</span><span class="p">()</span> <span class="o">===</span> <span class="kc">true</span><span class="p">){</span>
+					<span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
+					<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">);</span>
+				<span class="p">}</span>
+			<span class="p">},</span> <span class="nx">timeBetweenTries</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="nx">connSettings</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Do a GET request</span>
+<span class="cm">		 * @param {*} params parameters to pass through</span>
+<span class="cm">		 * @callback {Function} Callback function (optional)</span>
+<span class="cm">		 * @optional {Object} configuration options</span>
+<span class="cm">		 */</span>
+		<span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+				<span class="nx">data</span><span class="o">:</span> <span class="nx">params</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">connect</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="cm">/** GET but callback gets called with an object instead of a string</span>
+<span class="cm">		 * @param {*} params parameters to pass through</span>
+<span class="cm">		 * @callback {Function} Callback function (optional)</span>
+<span class="cm">		 * @optional {Object} configuration options</span>
+<span class="cm">		 */</span>
+		<span class="nx">getJSON</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;json&quot;</span><span class="p">};</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="cm">/** GET but callback gets called with HTML. Use for navigation</span>
+<span class="cm">		 * @param {*} params parameters to pass through</span>
+<span class="cm">		 * @callback {Function} Callback function (optional)</span>
+<span class="cm">		 * @optional {Object} configuration options</span>
+<span class="cm">		 */</span>
+		<span class="nx">getHTML</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;HTML&quot;</span><span class="p">,</span>
+				<span class="nx">type</span><span class="o">:</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;POST&#39;</span> <span class="o">:</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>
+				<span class="nx">data</span><span class="o">:</span> <span class="nx">params</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">connect</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="cm">/** Ajax POST</span>
+<span class="cm">		 * @param {*} params parameters to pass through</span>
+<span class="cm">		 * @callback {Function} Callback function (optional)</span>
+<span class="cm">		 * @optional {Object} configuration options</span>
+<span class="cm">		 */</span>
+		<span class="nx">post</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span>  <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+				<span class="nx">data</span><span class="o">:</span> <span class="nx">params</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">connect</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="cm">/** Rudimentary connection; Use if u need to override gets or posts; use &#39;data&#39; for params and other standard Jquery options</span>
+<span class="cm">		 * @param {*} params parameters to pass through</span>
+<span class="cm">		 * @callback {Function} Callback function (optional)</span>
+<span class="cm">		 * @optional {Object} configuration options</span>
+<span class="cm">		 */</span>
+		<span class="nx">connect</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">){</span>
+			<span class="nx">connect</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cm">/** Polls a specified url for a value</span>
+<span class="cm"> * @class PollingConnection</span>
+<span class="cm"> * @extends AjaxConnection</span>
+<span class="cm"> * @constructor</span>
+<span class="cm"> * @namespace</span>
+<span class="cm"> * @param {String} url url to connect to; Assumed to be JSON</span>
+<span class="cm"> * @param {*} conditionFlags List of conditions to check result against. Set this to blank and provide a onPulse fn for infinite polling.</span>
+<span class="cm"> * @param {Object} options to AjaxConnection</span>
+<span class="cm"> * @return {this}</span>
+<span class="cm"> */</span>
+<span class="kd">var</span> <span class="nx">PollingConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">conditionFlags</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+	<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span><span class="p">{</span>
+		<span class="cm">/** Calls the callback function if ANY of the conditions match. Set to false to match ALL</span>
+<span class="cm">		 * @config matchAny</span>
+<span class="cm">		 * @type Boolean</span>
+<span class="cm">		 * @default true</span>
+<span class="cm">		 */</span>
+		<span class="nx">matchAny</span> <span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+		<span class="cm">/** Success handler when conditions have been met</span>
+<span class="cm">		 * @config onSuccess</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">onSuccess</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">,</span>
+		<span class="cm">/** Time between polling attempts in ms</span>
+<span class="cm">		 * @config interval</span>
+<span class="cm">		 * @type Number</span>
+<span class="cm">		 * @default 18000</span>
+<span class="cm">		 */</span>
+		<span class="nx">interval</span><span class="o">:</span> <span class="mi">18000</span><span class="p">,</span>
+		<span class="cm">/** Params to pass to the file being polled.</span>
+<span class="cm">		 * @config params</span>
+<span class="cm">		 * @type *</span>
+<span class="cm">		 */</span>
+		<span class="nx">params</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+		<span class="cm">/** Function to execute every polling interval.</span>
+<span class="cm">		 * @config onPulse</span>
+<span class="cm">		 * @type Function</span>
+<span class="cm">		 */</span>
+		<span class="nx">onPulse</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span>
+	<span class="p">}</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span>
+	
+	<span class="kd">var</span> <span class="nx">jQOptions</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+		<span class="nx">type</span><span class="o">:</span> <span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">params</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;POST&#39;</span> <span class="o">:</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>
+		<span class="nx">data</span><span class="o">:</span>  <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">params</span><span class="p">)</span>
+	<span class="p">}</span>
+	
+	<span class="kd">var</span> <span class="nx">timer</span><span class="p">;</span>
+	<span class="kd">var</span> <span class="nx">successHandler</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">conditionSatisfied</span><span class="p">;</span>
+		<span class="nx">conditionFlags</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">conditionFlags</span><span class="p">);</span>
+		
+		<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">condition</span> <span class="k">in</span> <span class="nx">conditionFlags</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">data</span><span class="p">[</span><span class="nx">condition</span><span class="p">]</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">data</span><span class="p">[</span><span class="nx">condition</span><span class="p">]</span> <span class="o">!=</span> <span class="nx">conditionFlags</span><span class="p">[</span><span class="nx">condition</span><span class="p">]){</span> <span class="c1">//Condition not satisfied</span>
+				<span class="nx">conditionSatisfied</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+				<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">matchAny</span><span class="p">){</span>
+					<span class="k">break</span><span class="p">;</span> <span class="c1">//We were supposed to match everything;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+			<span class="k">else</span><span class="p">{</span> <span class="c1">//Wee have a winnerrr</span>
+				<span class="nx">conditionSatisfied</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">matchAny</span><span class="p">){</span>
+					<span class="k">break</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		
+		<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">conditionSatisfied</span><span class="p">){</span>
+			<span class="nx">timer</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="nx">ac</span><span class="p">.</span><span class="nx">connect</span><span class="p">()},</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span> <span class="c1">//Poll condition not satisfied, try again</span>
+		<span class="p">}</span>
+		<span class="k">else</span><span class="p">{</span>
+			<span class="nx">defaults</span><span class="p">.</span><span class="nx">onSuccess</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+			<span class="nx">cancelTimer</span><span class="p">();</span>
+		<span class="p">}</span>
+		<span class="nx">defaults</span><span class="p">.</span><span class="nx">onPulse</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+	<span class="p">}</span>
+	
+	<span class="kd">var</span> <span class="nx">cancelTimer</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">timer</span><span class="p">)</span> <span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="kd">var</span> <span class="nx">acOptions</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="nx">tries</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+		<span class="nx">onSuccess</span><span class="o">:</span> <span class="nx">successHandler</span><span class="p">,</span>
+		<span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span>
+	<span class="p">}</span>
+	<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AjaxConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">acOptions</span><span class="p">,</span> <span class="nx">jQOptions</span><span class="p">);</span>
+	
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Start polling</span>
+<span class="cm">		 */</span>
+		<span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="nx">ac</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+		<span class="p">},</span>
+		<span class="cm">/** Stop polling</span>
+<span class="cm">		 */</span>
+		<span class="nx">cancel</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			<span class="nx">cancelTimer</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="c1">//Under construction</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">QS</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="nx">hasParam</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">param</span><span class="p">){</span>
+    	<span class="k">return</span> <span class="p">(</span><span class="o">!!</span><span class="k">this</span><span class="p">.</span><span class="nx">getParamValue</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">param</span><span class="p">));</span>
+    <span class="p">},</span>
+    <span class="nx">getParamValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">param</span><span class="p">){</span>
+    	<span class="kd">var</span> <span class="nx">objQs</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">qs</span><span class="p">);</span>
+    	<span class="k">return</span> <span class="nx">object</span><span class="p">[</span><span class="nx">param</span><span class="p">];</span>
+    <span class="p">},</span>
+    <span class="nx">setParamValue</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">param</span><span class="p">,</span> <span class="nx">value</span><span class="p">){</span>
+    	
+    <span class="p">},</span>
+    <span class="nx">combine</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+    	<span class="kd">var</span> <span class="nx">src</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>

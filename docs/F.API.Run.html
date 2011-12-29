@@ -1,0 +1,660 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: API  F.API.Run  </title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://www.forio.com/tools/js" title="Forio Javascript Library">Forio Javascript Library</a></h1>
+        <h3>API&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Forio Javascript Library">Forio Javascript Library</a> 
+            &gt; <a href="./module_api.html" title="API">API</a>
+                 &gt; F.API.Run 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        <code>static</code>
+                        
+                            Class <b property="yui:name">F.API.Run</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        Perform operations on runs
+                    </div>
+
+                    
+                    <div rel="yui:properties" resource="#properties">
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_clone">
+                                    <h4>
+                                        <a name="method_clone">clone</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">clone</strong>
+                                           (
+                                                
+                                                        
+                                                         runId
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Clone run. Use 'target' param to point to a file with $Run.RunId to make it return new RunId
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">runId</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> the run to clone</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_connect">
+                                    <h4>
+                                        <a name="method_connect">connect</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">connect</strong>
+                                           (
+                                                
+                                                        
+                                                         key
+                                                    
+                                                
+                                                        , 
+                                                         params
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Generic connection handler, does no params by default
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">key</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> params to post</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_doActions">
+                                    <h4>
+                                        <a name="method_doActions">doActions</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">doActions</strong>
+                                           (
+                                                
+                                                        
+                                                         actions
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Perform run actions; step, clone etc
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">actions</span>
+                                                        &lt;<span property="yui:type">String||Array</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> one or more actions to set</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_getInfo">
+                                    <h4>
+                                        <a name="method_getInfo">getInfo</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Object
+                                            <strong property="yui:name">getInfo</strong>
+                                           (
+                                                
+                                                        
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Get Information about current run
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            Object
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">callback() the run object</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_reset">
+                                    <h4>
+                                        <a name="method_reset">reset</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">reset</strong>
+                                           (
+                                                
+                                                        
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Reset run to initial
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_saveValues">
+                                    <h4>
+                                        <a name="method_saveValues">saveValues</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">saveValues</strong>
+                                           (
+                                                
+                                                        
+                                                         values
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Save Decisions
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">values</span>
+                                                        &lt;<span property="yui:type">Mixed</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> values to save</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_setProperties">
+                                    <h4>
+                                        <a name="method_setProperties">setProperties</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">setProperties</strong>
+                                           (
+                                                
+                                                        
+                                                         properties
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Set properties of current run; name, desc, etc
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">properties</span>
+                                                        &lt;<span property="yui:type">Mixed</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> properties to set, can take multiple</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_stepTo">
+                                    <h4>
+                                        <a name="method_stepTo">stepTo</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">stepTo</strong>
+                                           (
+                                                
+                                                        
+                                                         step
+                                                    
+                                                
+                                                        , 
+                                                         callback
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Advance Run. Just do doActions("step") if you just want to step once. Same as "doActions('step_to_x')"
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">step</span>
+                                                        &lt;<span property="yui:type">String || Number</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> the step to advance to</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">callback</span>
+                                                        &lt;<span property="yui:type">Function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> (optional)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_api.html" title="API">API</a></li>
+                                <li class=""><a href="module_net.html" title="Net">Net</a></li>
+                                <li class=""><a href="module_utils.html" title="Utils">Utils</a></li>
+                                <li class=""><a href="module_widgets.html" title="Widgets">Widgets</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="F.API.Archive.html" title="F.API.Archive">F.API.Archive</a></li>
+                                <li class=""><a href="F.API.Auth.html" title="F.API.Auth">F.API.Auth</a></li>
+                                <li class=""><a href="F.API.Data.html" title="F.API.Data">F.API.Data</a></li>
+                                <li class="selected"><a href="F.API.Run.html" title="F.API.Run">F.API.Run</a></li>
+                                <li class=""><a href="F.APIUtils.html" title="F.APIUtils">F.APIUtils</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="net.js.html" title="net.js">net.js</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_clone" title="clone">clone</a></li>
+                                <li class=""><a href="#method_connect" title="connect">connect</a></li>
+                                <li class=""><a href="#method_doActions" title="doActions">doActions</a></li>
+                                <li class=""><a href="#method_getInfo" title="getInfo">getInfo</a></li>
+                                <li class=""><a href="#method_reset" title="reset">reset</a></li>
+                                <li class=""><a href="#method_saveValues" title="saveValues">saveValues</a></li>
+                                <li class=""><a href="#method_setProperties" title="setProperties">setProperties</a></li>
+                                <li class=""><a href="#method_stepTo" title="stepTo">stepTo</a></li>
+                        </ul>
+                    </div>
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+       <!-- Copyright &copy; 2010 Forio All rights reserved. -->
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "F.APIUtils.html#property_basePath", "access": "", "host": "F.APIUtils", "type": "property", "name": "basePath"}, {"url": "F.API.Run.html#method_clone", "access": "", "host": "F.API.Run", "type": "method", "name": "clone"}, {"url": "F.API.Data.html#method_connect", "access": "", "host": "F.API.Data", "type": "method", "name": "connect"}, {"url": "F.API.Run.html#method_connect", "access": "", "host": "F.API.Run", "type": "method", "name": "connect"}, {"url": "F.API.Run.html#method_doActions", "access": "", "host": "F.API.Run", "type": "method", "name": "doActions"}, {"url": "F.APIUtils.html#property_domain", "access": "", "host": "F.APIUtils", "type": "property", "name": "domain"}, {"url": "F.API.Run.html#method_getInfo", "access": "", "host": "F.API.Run", "type": "method", "name": "getInfo"}, {"url": "F.APIUtils.html#method_getURL", "access": "", "host": "F.APIUtils", "type": "method", "name": "getURL"}, {"url": "F.API.Data.html#method_load", "access": "", "host": "F.API.Data", "type": "method", "name": "load"}, {"url": "F.API.Data.html#method_remove", "access": "", "host": "F.API.Data", "type": "method", "name": "remove"}, {"url": "F.API.Run.html#method_reset", "access": "", "host": "F.API.Run", "type": "method", "name": "reset"}, {"url": "F.API.Data.html#method_save", "access": "", "host": "F.API.Data", "type": "method", "name": "save"}, {"url": "F.API.Data.html#method_saveAs", "access": "", "host": "F.API.Data", "type": "method", "name": "saveAs"}, {"url": "F.API.Run.html#method_saveValues", "access": "", "host": "F.API.Run", "type": "method", "name": "saveValues"}, {"url": "F.API.Run.html#method_setProperties", "access": "", "host": "F.API.Run", "type": "method", "name": "setProperties"}, {"url": "F.APIUtils.html#property_simPath", "access": "", "host": "F.APIUtils", "type": "property", "name": "simPath"}, {"url": "F.APIUtils.html#property_simulatePath", "access": "", "host": "F.APIUtils", "type": "property", "name": "simulatePath"}, {"url": "F.API.Run.html#method_stepTo", "access": "", "host": "F.API.Run", "type": "method", "name": "stepTo"}, {"url": "F.APIUtils.html#property_userPath", "access": "", "host": "F.APIUtils", "type": "property", "name": "userPath"}];
+</script>
+</body>
+</html>

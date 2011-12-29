@@ -1,0 +1,554 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: Connection  F.API.AjaxConnection  </title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://www.forio.com/tools/js" title="Forio Javascript Library">Forio Javascript Library</a></h1>
+        <h3>Connection&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Forio Javascript Library">Forio Javascript Library</a> 
+            &gt; <a href="./module_connection.html" title="Connection">Connection</a>
+                 &gt; F.API.AjaxConnection 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">F.API.AjaxConnection</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        Use for all ajax-y stuff within simulations. Among other benefits, it re-tries connections on failure, does param parsing etc.
+                    </div>
+
+                        <div class="section constructor details" rel="yui:constructor" resource="#constructor">
+                        <h3 id="constructor">Constructor</h3>
+                        <div class="content">
+                            <div class="detail">
+                                <strong property="yui:name">F.API.AjaxConnection</strong>
+                                <code>
+                                    (
+  
+                                        
+                                                
+                                                url
+
+                                                , 
+                                                settings
+
+                                                , 
+                                                ajaxOptions
+                                    )
+                                </code>
+                                <div class="description">
+                                        <dl rel="yui:parameters">
+                                            <dt>Parameters:</dt>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">url</span>
+                                                    &lt;<span property="yui:type">String</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> url to connect to</span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">settings</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> Configuration options; see configs section below for values</span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">ajaxOptions</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> default jQuery ajax options</span>
+                                                </dd>
+                                        </dl>
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div rel="yui:properties" resource="#properties">
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_connect">
+                                    <h4>
+                                        <a name="method_connect">connect</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">connect</strong>
+                                           (
+                                                
+                                                        
+                                                         params
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Rudimentary connection; Use if u need to override gets or posts; use 'data' for params and other standard Jquery options
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> parameters to pass through</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_get">
+                                    <h4>
+                                        <a name="method_get">get</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">get</strong>
+                                           (
+                                                
+                                                        
+                                                         params
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Do a GET request
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> parameters to pass through</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_getHTML">
+                                    <h4>
+                                        <a name="method_getHTML">getHTML</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">getHTML</strong>
+                                           (
+                                                
+                                                        
+                                                         params
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            GET but callback gets called with HTML. Use for navigation
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> parameters to pass through</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_getJSON">
+                                    <h4>
+                                        <a name="method_getJSON">getJSON</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">getJSON</strong>
+                                           (
+                                                
+                                                        
+                                                         params
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            GET but callback gets called with an object instead of a string
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> parameters to pass through</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_post">
+                                    <h4>
+                                        <a name="method_post">post</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">post</strong>
+                                           (
+                                                
+                                                        
+                                                         params
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Ajax POST
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">params</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> parameters to pass through</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+                        <div class="section field details">
+                            <h3 id="configattributes">Configuration Attributes</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:attribute" resource="#config_allowRedirect">
+                                    <h4><a name="config_allowRedirect">allowRedirect</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            If true, the call redirects to the login page on access denied errors; else it calls the error handlers
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: false
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_onComplete">
+                                    <h4><a name="config_onComplete">onComplete</a>
+                                        <code>- <span property="yui:type">Function</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Request termination handler; called regardless of success or failure
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_onError">
+                                    <h4><a name="config_onError">onError</a>
+                                        <code>- <span property="yui:type">Function</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Error handler. By default shows the error message in an alert, and logs to console if possible
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_onSuccess">
+                                    <h4><a name="config_onSuccess">onSuccess</a>
+                                        <code>- <span property="yui:type">Function</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Success handler. Called with response
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_parameterParser">
+                                    <h4><a name="config_parameterParser">parameterParser</a>
+                                        <code>- <span property="yui:type">Function</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Run the query params through this function before posting it; use F.makeQueryString in most cases. TODO:// should i default to this?
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_preloadCondition">
+                                    <h4><a name="config_preloadCondition">preloadCondition</a>
+                                        <code>- <span property="yui:type">Function</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Connection not made till this function returns true; Used to remove swfs off page for ie, and maybe for validation before posting
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_reconnectInterval">
+                                    <h4><a name="config_reconnectInterval">reconnectInterval</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Time between reconnection attempts
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 2000
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_tries">
+                                    <h4><a name="config_tries">tries</a>
+                                        <code>- <span property="yui:type">Number</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The no. of times to retry request before calling error handler
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 2
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+
+                            </div>
+                        </div>
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_connection.html" title="Connection">Connection</a></li>
+                                <li class=""><a href="module_forio.html" title="Forio">Forio</a></li>
+                                <li class=""><a href="module_forioapi.html" title="Forio.API">Forio.API</a></li>
+                                <li class=""><a href="module_widgets.html" title="Widgets">Widgets</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="APIConnection.html" title="APIConnection">APIConnection</a></li>
+                                <li class="selected"><a href="F.API.AjaxConnection.html" title="F.API.AjaxConnection">F.API.AjaxConnection</a></li>
+                                <li class=""><a href="F.API.PollingConnection.html" title="F.API.PollingConnection">F.API.PollingConnection</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="Api.js.html" title="Api.js">Api.js</a></li>
+                                <li class=""><a href="utils.js.html" title="utils.js">utils.js</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_connect" title="connect">connect</a></li>
+                                <li class=""><a href="#method_get" title="get">get</a></li>
+                                <li class=""><a href="#method_getHTML" title="getHTML">getHTML</a></li>
+                                <li class=""><a href="#method_getJSON" title="getJSON">getJSON</a></li>
+                                <li class=""><a href="#method_post" title="post">post</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="configList" class="module">
+                        <h4>Configuration Attributes</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#config_allowRedirect" title="allowRedirect">allowRedirect</a></li>
+                                <li class=""><a href="#config_onComplete" title="onComplete">onComplete</a></li>
+                                <li class=""><a href="#config_onError" title="onError">onError</a></li>
+                                <li class=""><a href="#config_onSuccess" title="onSuccess">onSuccess</a></li>
+                                <li class=""><a href="#config_parameterParser" title="parameterParser">parameterParser</a></li>
+                                <li class=""><a href="#config_preloadCondition" title="preloadCondition">preloadCondition</a></li>
+                                <li class=""><a href="#config_reconnectInterval" title="reconnectInterval">reconnectInterval</a></li>
+                                <li class=""><a href="#config_tries" title="tries">tries</a></li>
+                        </ul>
+                    </div>
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Forio All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "F.API.AjaxConnection.html#config_allowRedirect", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "allowRedirect"}, {"url": "F.API.AjaxConnection.html#method_connect", "access": "", "host": "F.API.AjaxConnection", "type": "method", "name": "connect"}, {"url": "F.API.AjaxConnection.html#method_get", "access": "", "host": "F.API.AjaxConnection", "type": "method", "name": "get"}, {"url": "F.API.AjaxConnection.html#method_getHTML", "access": "", "host": "F.API.AjaxConnection", "type": "method", "name": "getHTML"}, {"url": "F.API.AjaxConnection.html#method_getJSON", "access": "", "host": "F.API.AjaxConnection", "type": "method", "name": "getJSON"}, {"url": "F.API.AjaxConnection.html#config_onComplete", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "onComplete"}, {"url": "F.API.AjaxConnection.html#config_onError", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "onError"}, {"url": "F.API.AjaxConnection.html#config_onSuccess", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "onSuccess"}, {"url": "F.API.AjaxConnection.html#config_parameterParser", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "parameterParser"}, {"url": "F.API.AjaxConnection.html#method_post", "access": "", "host": "F.API.AjaxConnection", "type": "method", "name": "post"}, {"url": "F.API.AjaxConnection.html#config_preloadCondition", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "preloadCondition"}, {"url": "F.API.AjaxConnection.html#config_reconnectInterval", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "reconnectInterval"}, {"url": "APIConnection.html#config_target", "access": "", "host": "APIConnection", "type": "config", "name": "target"}, {"url": "F.API.AjaxConnection.html#config_tries", "access": "", "host": "F.API.AjaxConnection", "type": "config", "name": "tries"}];
+</script>
+</body>
+</html>

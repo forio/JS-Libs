@@ -1,0 +1,196 @@
+<div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * @author Naren</span>
+<span class="cm"> * @module Widgets</span>
+<span class="cm"> */</span>
+ 
+ <span class="cm">/** Handy popup as an alternative to ugly HTML alerts. Oh, and it also does callbacks.</span>
+<span class="cm"> * @class Dialogs</span>
+<span class="cm"> * @static </span>
+<span class="cm"> * @namespace</span>
+<span class="cm"> * @extends YAHOO.widget.SimpleDialog</span>
+<span class="cm"> */</span>
+<span class="kd">var</span> <span class="nx">Dialogs</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * @param {String} divId Location to initailze dialog. Saves time if the div is already in YUI form;</span>
+<span class="cm">	 * 		&lt;textarea&gt;</span>
+<span class="cm">	 * 			&lt;div id=&quot;container&quot;&gt;</span>
+<span class="cm">	 * 				&lt;div class=&quot;hd&quot;&gt; Your Header &lt;/div&gt;</span>
+<span class="cm">	 * 				&lt;div class=&quot;bd&quot;&gt; Your Body &lt;/div&gt;</span>
+<span class="cm">	 * 				&lt;div class=&quot;ft&quot;&gt; Foorter text &lt;/div&gt;</span>
+<span class="cm">	 * 			&lt;/div&gt;</span>
+<span class="cm">	 * 		&lt;/textarea&gt;</span>
+<span class="cm">	 * @param {String} backupDiv By default you get one popup per app; Older one closes if new one comes in;</span>
+<span class="cm">	 * 	Give another &quot;backup&quot; id if you want two at a time</span>
+<span class="cm">	 */</span>
+	<span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">divId</span><span class="p">,</span> <span class="nx">backupDiv</span><span class="p">){</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">ElemId</span> <span class="o">=</span> <span class="nx">divId</span><span class="p">;</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">alertDialog</span> <span class="o">=</span> 
+			<span class="k">new</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">(</span><span class="nx">divId</span><span class="p">,</span> 
+			 <span class="p">{</span> <span class="nx">width</span><span class="o">:</span> <span class="s2">&quot;600px&quot;</span><span class="p">,</span>
+			   <span class="nx">fixedcenter</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+			   <span class="nx">visible</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+			   <span class="nx">draggable</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+			   <span class="nx">zIndex</span><span class="o">:</span> <span class="mi">19</span><span class="p">,</span>
+			   <span class="nx">modal</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+			   <span class="nx">close</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+			   <span class="nx">icon</span><span class="o">:</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">.</span><span class="nx">ICON_INFO</span><span class="p">,</span>
+			   <span class="nx">constraintoviewport</span><span class="o">:</span> <span class="kc">true</span>
+			 <span class="p">}</span> <span class="p">);</span>
+		 <span class="k">this</span><span class="p">.</span><span class="nx">alertDialog</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span> 
+		
+		<span class="k">if</span><span class="p">(</span><span class="nx">backupDiv</span><span class="p">){</span>
+	 		<span class="k">this</span><span class="p">.</span><span class="nx">backupDialog</span> <span class="o">=</span> 
+				<span class="k">new</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">(</span><span class="nx">backupDiv</span><span class="p">,</span> 
+				 <span class="p">{</span> <span class="nx">width</span><span class="o">:</span> <span class="s2">&quot;600px&quot;</span><span class="p">,</span>
+				   <span class="nx">fixedcenter</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+				   <span class="nx">visible</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+				   <span class="nx">draggable</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+				   <span class="nx">zIndex</span><span class="o">:</span> <span class="mi">19</span><span class="p">,</span>
+				   <span class="nx">modal</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+				   <span class="nx">close</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+				   <span class="nx">icon</span><span class="o">:</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">.</span><span class="nx">ICON_INFO</span><span class="p">,</span>
+				   <span class="nx">constraintoviewport</span><span class="o">:</span> <span class="kc">true</span>
+				 <span class="p">}</span> <span class="p">);</span>
+			 <span class="k">this</span><span class="p">.</span><span class="nx">backupDialog</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * @private</span>
+<span class="cm">	 */</span>
+	<span class="nx">_isDialogOpen</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">dialog</span><span class="p">){</span>
+		<span class="k">return</span> <span class="nx">dialog</span><span class="p">.</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s1">&#39;visible&#39;</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * @private</span>
+<span class="cm">	 */</span>
+	<span class="nx">_executeFnAndHide</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callBackFn</span><span class="p">){</span>
+    	<span class="kd">var</span> <span class="nx">allowHide</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">callBackFn</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">fnReturnVal</span> <span class="o">=</span> <span class="nx">callBackFn</span><span class="p">();</span>
+			<span class="c1">//If you want to disable the dialog autoclosing, make the fn return nothing. OR true.</span>
+			<span class="c1">// Useful if you&#39;re doing validation on stuff in dialog.</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">fnReturnVal</span> <span class="o">!=</span> <span class="kc">undefined</span> <span class="o">&amp;&amp;</span> <span class="nx">fnReturnVal</span> <span class="o">!==</span> <span class="kc">true</span><span class="p">){</span> 
+				<span class="nx">allowHide</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">allowHide</span><span class="p">)</span> <span class="k">this</span><span class="p">.</span><span class="nx">hide</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * @private</span>
+<span class="cm">	 */</span>
+	<span class="nx">_applyConfigAndShow</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cfg</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">dialog</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">alertDialog</span><span class="p">;</span>
+		<span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_isDialogOpen</span><span class="p">(</span><span class="nx">dialog</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">backupDialog</span> <span class="o">&amp;&amp;</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">singleton</span> <span class="o">!==</span> <span class="kc">true</span><span class="p">){</span>
+			<span class="nx">dialog</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">backupDialog</span><span class="p">;</span>
+		<span class="p">}</span>
+		 
+		<span class="nx">dialog</span><span class="p">.</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">applyConfig</span><span class="p">(</span><span class="nx">cfg</span><span class="p">);</span>
+		<span class="nx">dialog</span><span class="p">.</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">fireQueue</span><span class="p">();</span>
+		<span class="nx">dialog</span><span class="p">.</span><span class="nx">setHeader</span><span class="p">(</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">header</span><span class="p">);</span>
+		<span class="nx">dialog</span><span class="p">.</span><span class="nx">show</span><span class="p">();</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * Displays the popup box</span>
+<span class="cm">	 * @param {String|HTML} text stuff to display in the popup</span>
+<span class="cm">	 * @param {Function} callBackFn Executed on dialog close by default; Closes the popup if this returns undefined OR true. </span>
+<span class="cm">	 * 					 Doesn&#39;t close for other values. Useful to do validation stuff, especially on &quot;confirm&quot; boxes</span>
+<span class="cm">	 * @param {Object} options Besides the default YUI dialog options, use {singleton: true} to force only 1 open at a time</span>
+<span class="cm">	 */</span>
+	<span class="nx">show</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callBackFn</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">icon</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+			<span class="nx">header</span><span class="o">:</span> <span class="s2">&quot;Alert&quot;</span><span class="p">,</span>
+			<span class="cm">/** Allow only one instance of dialog at a time</span>
+<span class="cm">			 * @config singleton</span>
+<span class="cm">			 * @type Boolean</span>
+<span class="cm">			 * @default false</span>
+<span class="cm">			 */</span>
+			<span class="nx">singleton</span><span class="o">:</span> <span class="kc">false</span>
+		<span class="p">}</span>
+		
+		<span class="kd">var</span> <span class="nx">cg</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">text</span><span class="o">:</span> <span class="nx">text</span><span class="p">,</span>
+		    <span class="nx">buttons</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span><span class="s2">&quot;Ok&quot;</span><span class="p">,</span> <span class="nx">handler</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span>
+					<span class="nx">me</span><span class="p">.</span><span class="nx">_executeFnAndHide</span><span class="p">(</span><span class="nx">callBackFn</span><span class="p">);</span>
+				<span class="p">},</span> 
+				<span class="nx">isDefault</span><span class="o">:</span><span class="kc">true</span> <span class="p">}</span> <span class="p">]</span>
+		<span class="p">}</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">cg</span><span class="p">);</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		
+		<span class="k">this</span><span class="p">.</span><span class="nx">_applyConfigAndShow</span><span class="p">(</span><span class="nx">defaults</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * Hides the popup from screen</span>
+<span class="cm">	 */</span>
+	<span class="nx">hide</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+		<span class="kd">var</span> <span class="nx">dialog</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">alertDialog</span><span class="p">;</span>
+		<span class="nx">dialog</span><span class="p">.</span><span class="nx">hide</span><span class="p">();</span>
+	<span class="p">},</span>
+	
+	<span class="cm">/**</span>
+<span class="cm">	 * Shows a modal popup; same as calling show with {modal:true}</span>
+<span class="cm">	 * @param {String|HTML} text stuff to display in the popup</span>
+<span class="cm">	 * @param {Function} callBackFn Executed on dialog close by default</span>
+<span class="cm">	 * @param {Object} options Besides the default YUI dialog options, use {singleton: true} to have 1 at a time</span>
+<span class="cm">	 */</span>
+	<span class="nx">showModal</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">settings</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">options</span><span class="p">,</span> <span class="p">{</span><span class="nx">modal</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+		<span class="nx">Dialogs</span><span class="p">.</span><span class="nx">show</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="cm">/**</span>
+<span class="cm">	 * @param {HTML} text </span>
+<span class="cm">	 * @param {Function} callBackFn  Have this false to stop dialog from closing; Useful for validators.</span>
+<span class="cm">	 * @param {Object} options &lt;optional&gt;</span>
+<span class="cm">	 */</span>
+	<span class="nx">showAlert</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callBackFn</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span>  <span class="p">{</span>
+			<span class="nx">header</span><span class="o">:</span> <span class="s2">&quot;Alert&quot;</span><span class="p">,</span>
+			<span class="nx">icon</span><span class="o">:</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">.</span><span class="nx">ICON_INFO</span>
+		<span class="p">}</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">show</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callBackFn</span><span class="p">,</span><span class="nx">defaults</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="nx">showError</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callBackFn</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">header</span><span class="o">:</span> <span class="s2">&quot;Error&quot;</span><span class="p">,</span>
+			<span class="nx">icon</span><span class="o">:</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">SimpleDialog</span><span class="p">.</span><span class="nx">ICON_WARN</span>
+		<span class="p">};</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">show</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">callBackFn</span><span class="p">,</span><span class="nx">defaults</span><span class="p">);</span>
+	<span class="p">},</span>
+	<span class="nx">confirm</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">header</span><span class="o">:</span> <span class="s2">&quot;Confirm&quot;</span><span class="p">,</span>
+			<span class="nx">icon</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+			<span class="nx">okText</span><span class="o">:</span> <span class="s2">&quot;Ok&quot;</span><span class="p">,</span>
+			<span class="nx">onOK</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+			<span class="nx">cancelText</span><span class="o">:</span> <span class="s2">&quot;Cancel&quot;</span><span class="p">,</span>
+			<span class="nx">onCancel</span><span class="o">:</span> <span class="kc">null</span>
+		<span class="p">};</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		
+		<span class="kd">var</span> <span class="nx">cfg</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="nx">text</span><span class="o">:</span> <span class="nx">text</span><span class="p">,</span>
+			<span class="nx">buttons</span><span class="o">:</span> <span class="p">[</span> 
+				<span class="p">{</span> 
+					<span class="nx">text</span><span class="o">:</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">okText</span><span class="p">,</span> <span class="nx">handler</span><span class="o">:</span><span class="kd">function</span><span class="p">(){</span>
+		    					<span class="nx">me</span><span class="p">.</span><span class="nx">_executeFnAndHide</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">onOK</span><span class="p">);</span>
+							<span class="p">},</span> 
+					<span class="nx">isDefault</span><span class="o">:</span><span class="kc">true</span> 
+				<span class="p">},</span>
+				<span class="p">{</span>
+					<span class="nx">text</span><span class="o">:</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">cancelText</span><span class="p">,</span> <span class="nx">handler</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+						<span class="nx">me</span><span class="p">.</span><span class="nx">_executeFnAndHide</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">onCancel</span><span class="p">);</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+				<span class="p">]</span>
+		<span class="p">}</span>
+		<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">cfg</span><span class="p">);</span>
+		
+		<span class="k">this</span><span class="p">.</span><span class="nx">_applyConfigAndShow</span><span class="p">(</span><span class="nx">defaults</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">};</span>
+</pre></div>

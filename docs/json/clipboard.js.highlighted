@@ -1,0 +1,186 @@
+<div class="highlight"><pre><span class="cm">/** UI widgets being used across simulations</span>
+<span class="cm"> * @author Naren</span>
+<span class="cm"> * @module Widgets</span>
+<span class="cm"> */</span>
+
+<span class="cm">/** Provides a copy to clipboard flash button. If using on multiple places in a page, init once and clone many times</span>
+<span class="cm"> * @class ClipBoard</span>
+<span class="cm"> * @namespace</span>
+<span class="cm"> * @static</span>
+<span class="cm"> * @example</span>
+<span class="cm"> *      var cc = ClipBoard.init(&#39;domId&#39;);</span>
+<span class="cm"> *          cc.render(&quot;fnToBeCalledOnClick&quot;, &quot;domIdIfYouWantToCloneIt&quot;);</span>
+<span class="cm"> *		or just ClipBoard.init(&quot;domId&quot;, settings);</span>
+<span class="cm"> */</span>
+<span class="kd">var</span> <span class="nx">ClipBoard</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+	<span class="k">return</span><span class="p">{</span>
+	    <span class="nx">_params</span><span class="o">:</span> <span class="p">{</span>
+	        <span class="nx">scale</span><span class="o">:</span> <span class="s1">&#39;noscale&#39;</span><span class="p">,</span>
+	        <span class="nx">salign</span><span class="o">:</span> <span class="s1">&#39;lt&#39;</span><span class="p">,</span>
+	        <span class="nx">wmode</span><span class="o">:</span> <span class="s1">&#39;transparent&#39;</span><span class="p">,</span>
+	        <span class="nx">allowScriptAccess</span><span class="o">:</span> <span class="s2">&quot;always&quot;</span>
+	    <span class="p">},</span> 
+	    <span class="nx">_defaultDimensions</span><span class="o">:</span> <span class="p">{</span>
+	        <span class="nx">width</span><span class="o">:</span> <span class="s1">&#39;175&#39;</span><span class="p">,</span>
+	        <span class="nx">height</span><span class="o">:</span> <span class="s1">&#39;30&#39;</span>
+	    <span class="p">},</span>
+	    <span class="nx">_defaultSettings</span><span class="o">:</span> <span class="p">{</span>
+	        <span class="nx">onInit</span><span class="o">:</span> <span class="s2">&quot;ClipBoard.onInit&quot;</span><span class="p">,</span>
+	    	<span class="cm">/** Text to be displayed in the Button</span>
+<span class="cm">		     * @config text</span>
+<span class="cm">		     * @type  String</span>
+<span class="cm">		     * @default &#39;Copy to Clipboard&#39;</span>
+<span class="cm">		     */</span>
+	        <span class="nx">text</span><span class="o">:</span> <span class="s2">&quot;Copy To Clipboard&quot;</span><span class="p">,</span>
+	        <span class="cm">/** Function the SWF calls to get data; Override if you want copy fancy formatted data etc</span>
+<span class="cm">		     * @config datasource</span>
+<span class="cm">		     * @type  String</span>
+<span class="cm">		     * @default ClipBoard.copyTable(&#39;.dataTable&#39;)</span>
+<span class="cm">		     */</span> 
+	        <span class="nx">datasource</span><span class="o">:</span> <span class="s2">&quot;ClipBoard.copyTable(&#39;.dataTable&#39;)&quot;</span><span class="p">,</span>
+			<span class="cm">/** Path to icon for copy image</span>
+<span class="cm">			 * @config icon</span>
+<span class="cm">			 * @type String</span>
+<span class="cm">		     * @default &quot;../img/page_white_paste.png&quot;</span>
+<span class="cm">			 */</span>
+	        <span class="nx">icon</span><span class="o">:</span> <span class="s2">&quot;../img/page_white_paste.png&quot;</span><span class="p">,</span>
+	        <span class="cm">/** Success handler on successful copy; Displays an alert/Dialog by default</span>
+<span class="cm">	    	 * @config onSuccess</span>
+<span class="cm">	    	 * @type String</span>
+<span class="cm">	    	 * @default  &quot;ClipBoard.copySuccess&quot;</span>
+<span class="cm">	         */</span>
+	        <span class="nx">onSuccess</span><span class="o">:</span> <span class="s2">&quot;ClipBoard.copySuccess&quot;</span><span class="p">,</span>
+			<span class="cm">/** Failure handler on failed copy; Displays an alert/Dialog by default</span>
+<span class="cm">			 * @config onFailure</span>
+<span class="cm">			 * @type String</span>
+<span class="cm">			 * @default  &quot;ClipBoard.copyFailure&quot;</span>
+<span class="cm">			 */</span>
+	        <span class="nx">onFailure</span><span class="o">:</span> <span class="s2">&quot;ClipBoard.copyFailure&quot;</span>
+	    <span class="p">},</span>
+	    <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+	    <span class="nx">mostRecentElementAttached</span><span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+	    <span class="nx">mostRecentConfig</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+	    
+	    <span class="nx">_alert</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">text</span><span class="p">){</span>
+	        <span class="k">try</span><span class="p">{</span>
+	             <span class="nx">Dialogs</span><span class="p">.</span><span class="nx">showAlert</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> 
+	        <span class="p">}</span>
+	        <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+	            <span class="nx">alert</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+	        <span class="p">}</span>
+	    <span class="p">},</span>
+	    
+	    <span class="cm">/** Initialization fn. Use Clipboard.swf?debug=true to print debug info to trace/console</span>
+<span class="cm">	     * @param domId {String}  - Elem where swf should be placed. </span>
+<span class="cm">	     * @param settings {Object} (Optional)  See config attributes</span>
+<span class="cm">	     * @param dimensions {Object} (Optional) Dom dimenstions of the form {width: x; height: x}</span>
+<span class="cm">	     */</span>
+	    <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">domId</span><span class="p">,</span> <span class="nx">settings</span><span class="p">,</span> <span class="nx">dimensions</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="nx">domId</span><span class="p">).</span><span class="nx">size</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+			
+	        <span class="k">this</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">domId</span><span class="p">;</span>
+	        <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_defaultDimensions</span><span class="p">,</span> <span class="nx">dimensions</span><span class="p">);</span>
+	        <span class="kd">var</span> <span class="nx">flashVars</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">_defaultSettings</span><span class="p">,</span><span class="nx">settings</span> <span class="p">);</span>
+	        <span class="nx">swfobject</span><span class="p">.</span><span class="nx">embedSWF</span><span class="p">(</span><span class="s2">&quot;swf/ClipBoard.swf&quot;</span><span class="p">,</span> <span class="nx">domId</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_defaultDimensions</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_defaultDimensions</span><span class="p">.</span><span class="nx">height</span><span class="p">,</span>
+	                        <span class="s1">&#39;9.0.0&#39;</span><span class="p">,</span><span class="s1">&#39;swf/expressInstall.swf&#39;</span><span class="p">,</span> <span class="nx">flashVars</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span> <span class="nx">_params</span><span class="p">);</span>
+	    <span class="p">},</span>
+	    
+	    <span class="cm">/** Specified as default datasource for Flash copy function</span>
+<span class="cm">	     * @private</span>
+<span class="cm">	     * @param {String} tableSelector jQuerySyntax</span>
+<span class="cm">	     * @return {String} tab/newline delimited data</span>
+<span class="cm">	     */</span>
+	    <span class="nx">copyTable</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tableSelector</span><span class="p">){</span>
+			<span class="nx">tableSelector</span> <span class="o">||</span> <span class="p">(</span><span class="nx">tableSelector</span> <span class="o">=</span> <span class="s1">&#39;table.dataTable&#39;</span><span class="p">);</span>
+			<span class="kd">var</span> <span class="nx">tableData</span> <span class="o">=</span> <span class="p">[];</span>
+			<span class="kd">var</span> <span class="nx">getCellContents</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">cell</span><span class="p">){</span>
+				<span class="kd">var</span> <span class="nx">textElems</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">cell</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">&#39;:text&#39;</span><span class="p">).</span><span class="nx">get</span><span class="p">();</span>
+				<span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+				<span class="k">if</span><span class="p">(</span><span class="o">!!</span><span class="nx">textElems</span><span class="p">.</span><span class="nx">length</span><span class="p">){</span>
+					<span class="nx">val</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">cell</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">&#39;:text&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">());</span>
+				<span class="p">}</span>
+				<span class="k">else</span><span class="p">{</span>
+					<span class="nx">val</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">cell</span><span class="p">).</span><span class="nx">text</span><span class="p">());</span>
+				<span class="p">}</span>	
+				<span class="k">return</span> <span class="nx">val</span><span class="p">;</span>
+			<span class="p">}</span>
+			
+			<span class="kd">var</span> <span class="nx">rowspanData</span> <span class="o">=</span> <span class="p">[];</span>
+			<span class="nx">$</span><span class="p">(</span><span class="nx">tableSelector</span> <span class="o">+</span> <span class="s2">&quot; tr&quot;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">row</span><span class="p">){</span>
+				<span class="kd">var</span> <span class="nx">rowspan</span> <span class="o">=</span>  <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">&#39;td[rowspan]:eq(1)&#39;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;rowspan&quot;</span><span class="p">);</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">rowspan</span> <span class="o">&amp;&amp;</span> <span class="nx">rowspan</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">){</span>
+					<span class="nx">rowspan</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">rowspan</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+					<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span> <span class="nx">rowspan</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+						<span class="kd">var</span> <span class="nx">thisRow</span> <span class="o">=</span> <span class="p">[];</span>
+						<span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">&#39;td, th&#39;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">cell</span><span class="p">){</span>
+							<span class="nx">thisRow</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">getCellContents</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+						<span class="p">});</span>
+						<span class="nx">rowspanData</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">thisRow</span><span class="p">);</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+				<span class="k">else</span><span class="p">{</span>
+					<span class="kd">var</span> <span class="nx">thisRow</span> <span class="o">=</span> <span class="p">[];</span>
+					<span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">children</span><span class="p">(</span><span class="s1">&#39;td, th&#39;</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="nx">cell</span><span class="p">){</span>
+							<span class="nx">thisRow</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">getCellContents</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+					<span class="p">});</span>
+					<span class="k">if</span><span class="p">(</span><span class="nx">rowspanData</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+						<span class="kd">var</span> <span class="nx">rowSpanForthisCell</span> <span class="o">=</span> <span class="nx">rowspanData</span><span class="p">.</span><span class="nx">pop</span><span class="p">();</span>
+						<span class="nx">thisRow</span> <span class="o">=</span> <span class="nx">rowSpanForthisCell</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">thisRow</span><span class="p">);</span>
+					<span class="p">}</span>
+					<span class="nx">tableData</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">thisRow</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;\t&quot;</span><span class="p">));</span>
+				<span class="p">}</span>
+			<span class="p">});</span>
+			<span class="k">return</span> <span class="nx">tableData</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;\n&quot;</span><span class="p">);</span>
+		<span class="p">},</span>
+	    <span class="cm">/** Initializes a second instance of the button</span>
+<span class="cm">	     * @param domId {String} (Optional)  - Use if you want to render the chart to a diff place than init.</span>
+<span class="cm">	     * @param settings {Object} (Optional) - See config</span>
+<span class="cm">	     */</span>
+	    <span class="nx">clone</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">domId</span><span class="p">,</span> <span class="nx">settings</span><span class="p">){</span>
+	        <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">_defaultSettings</span><span class="p">,</span>  <span class="nx">settings</span><span class="p">);</span>
+	        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">config</span><span class="p">.</span><span class="nx">datasource</span><span class="p">){</span>
+	            <span class="nx">ClipBoard</span><span class="p">.</span><span class="nx">_alert</span><span class="p">(</span><span class="s2">&quot;Error: No Datasource defined to copy from.&quot;</span><span class="p">);</span>
+	            <span class="k">return</span><span class="p">;</span>
+	        <span class="p">}</span>
+	
+	        <span class="k">if</span><span class="p">(</span><span class="nx">domId</span><span class="p">){</span> <span class="c1">// We&#39;re cloning</span>
+	            <span class="c1">//var newFlashObj = $(&#39;#&#39;+this.id).clone(); Makes ie blow up :)</span>
+	            <span class="kd">var</span> <span class="nx">newNode</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">cloneNode</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+	                <span class="nx">newNode</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="nx">domId</span><span class="p">;</span>
+	            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="nx">domId</span><span class="p">).</span><span class="nx">replaceWith</span><span class="p">(</span><span class="nx">newNode</span><span class="p">);</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentElementAttached</span> <span class="o">=</span> <span class="nx">domId</span><span class="p">;</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentConfig</span> <span class="o">=</span> <span class="nx">config</span><span class="p">;</span>
+	        <span class="p">}</span>
+	        <span class="k">else</span><span class="p">{</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentElementAttached</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentConfig</span> <span class="o">=</span> <span class="nx">config</span><span class="p">;</span>
+	        <span class="p">}</span>
+	    <span class="p">},</span>
+	    <span class="cm">/** Called by Flash when the swf is loaded. Needed &#39;coz onDOMReady doesn&#39;t play well with swfs</span>
+<span class="cm">	     * @private</span>
+<span class="cm">	     */</span>
+	    <span class="nx">onInit</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+	        <span class="c1">//console.log(&quot;initied&quot;, this.mostRecentElementAttached, this.mostRecentConfig)</span>
+	        <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">mostRecentElementAttached</span><span class="p">){</span>
+	            <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentElementAttached</span><span class="p">).</span><span class="nx">get</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">render</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">mostRecentConfig</span><span class="p">);</span> <span class="c1">// Flash render fn</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentElementAttached</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+	            <span class="k">this</span><span class="p">.</span><span class="nx">mostRecentConfig</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+	        <span class="p">}</span>
+	    <span class="p">},</span>
+	    <span class="cm">/** Default success handler. Called by Flash. Can be overriden through additional param to &#39;render&#39;</span>
+<span class="cm">	     * @private</span>
+<span class="cm">	     */</span>
+	    <span class="nx">copySuccess</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+	        <span class="kd">var</span> <span class="nx">sucText</span> <span class="o">=</span> <span class="s2">&quot;Data copied to clipboard.&quot;</span><span class="p">;</span>
+	        <span class="nx">ClipBoard</span><span class="p">.</span><span class="nx">_alert</span><span class="p">(</span><span class="nx">sucText</span><span class="p">);</span>
+	    <span class="p">},</span>
+	    <span class="cm">/** Default failure handler. Called by Flash. Can be overriden through additional param to &#39;render&#39;</span>
+<span class="cm">	     * @private</span>
+<span class="cm">	     */</span>
+	    <span class="nx">copyFailure</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">){</span>
+	        <span class="kd">var</span> <span class="nx">failText</span> <span class="o">=</span> <span class="s2">&quot;Error copying data: &quot;</span> <span class="o">+</span> <span class="nx">err</span><span class="p">;</span>
+	        <span class="nx">ClipBoard</span><span class="p">.</span><span class="nx">_alert</span><span class="p">(</span><span class="nx">failText</span><span class="p">);</span>
+	    <span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}();</span>
+</pre></div>

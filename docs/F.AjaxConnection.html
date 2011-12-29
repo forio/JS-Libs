@@ -1,0 +1,536 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: AjaxConnection  F.AjaxConnection  </title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://www.forio.com/tools/js" title="Forio Javascript Library">Forio Javascript Library</a></h1>
+        <h3>AjaxConnection&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Forio Javascript Library">Forio Javascript Library</a> 
+            &gt; <a href="./module_ajaxconnection.html" title="AjaxConnection">AjaxConnection</a>
+                 &gt; F.AjaxConnection 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">F.AjaxConnection</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        Use for all ajax-y stuff within simulations. Among other benefits, it re-tries connections on failure, does param parsing etc.
+                    </div>
+
+                        <div class="section constructor details" rel="yui:constructor" resource="#constructor">
+                        <h3 id="constructor">Constructor</h3>
+                        <div class="content">
+                            <div class="detail">
+                                <strong property="yui:name">F.AjaxConnection</strong>
+                                <code>
+                                    (
+  
+                                        
+                                                
+                                                url
+
+                                                , 
+                                                settings
+
+                                                , 
+                                                ajaxOptions
+                                    )
+                                </code>
+                                <div class="description">
+                                        <dl rel="yui:parameters">
+                                            <dt>Parameters:</dt>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">url</span>
+                                                    &lt;<span property="yui:type">String</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> url to connect to</span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">settings</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> Configuration options; see configs section below for values</span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">ajaxOptions</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> default jQuery ajax options</span>
+                                                </dd>
+                                        </dl>
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div rel="yui:properties" resource="#properties">
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_clone">
+                                    <h4>
+                                        <a name="method_clone">clone</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">clone</strong>
+                                           (
+                                                
+                                                        
+                                                         domId
+                                                    
+                                                
+                                                        , 
+                                                         settings
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Initializes a second instance of the button
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">domId</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  (Optional)  - Use if you want to render the chart to a diff place than init.</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">settings</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  (Optional) - See config</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="private" rel="yui:method" resource="#method_copyFailure">
+                                    <h4>
+                                        <a name="method_copyFailure">copyFailure</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         private 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">copyFailure</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Default failure handler. Called by Flash. Can be overriden through additional param to 'render'
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="private" rel="yui:method" resource="#method_copySuccess">
+                                    <h4>
+                                        <a name="method_copySuccess">copySuccess</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         private 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">copySuccess</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Default success handler. Called by Flash. Can be overriden through additional param to 'render'
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="private" rel="yui:method" resource="#method_copyTable">
+                                    <h4>
+                                        <a name="method_copyTable">copyTable</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         private 
+                                        
+                                        
+                                        String
+                                            <strong property="yui:name">copyTable</strong>
+                                           (
+                                                
+                                                        
+                                                         tableSelector
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Specified as default datasource for Flash copy function
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">tableSelector</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> jQuerySyntax</span>
+                                                        </dd>
+                                                </dl>
+
+                                                <dl>
+                                                    <dt>Returns:
+                                                    <code property="yui:return">
+                                                            String
+                                                    </code></dt>
+                                                    <dd property="yui:returnInfo">tab/newline delimited data</dd>
+                                                </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_init">
+                                    <h4>
+                                        <a name="method_init">init</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">init</strong>
+                                           (
+                                                
+                                                        
+                                                         domId
+                                                    
+                                                
+                                                        , 
+                                                         settings
+                                                    
+                                                
+                                                        , 
+                                                         dimensions
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Initialization fn. 
+Use Clipboard.swf?debug=true to print debug info to trace/console
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">domId</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">   - Elem where swf should be placed.</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">settings</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  (Optional)  See config attributes</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">dimensions</span>
+                                                        &lt;<span property="yui:type">Object} (Optional) Dom dimenstions of the form {width: x; height: x</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"></span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="private" rel="yui:method" resource="#method_onInit">
+                                    <h4>
+                                        <a name="method_onInit">onInit</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                         private 
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">onInit</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Called by Flash when the swf is loaded. Needed 'coz onDOMReady doesn't play well with swfs
+                                        </div>
+
+                                        <div class="description">
+
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+                        <div class="section field details">
+                            <h3 id="configattributes">Configuration Attributes</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:attribute" resource="#config_icon">
+                                    <h4><a name="config_icon">icon</a>
+                                        <code>- <span property="yui:type">String</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Path to icon for copy image
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: "../img/page_white_paste.png"
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_onFailure">
+                                    <h4><a name="config_onFailure">onFailure</a>
+                                        <code>- <span property="yui:type">String</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Failure handler on failed copy; Displays an alert/Dialog by default
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: "ClipBoard.copyFailure"
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_onSuccess">
+                                    <h4><a name="config_onSuccess">onSuccess</a>
+                                        <code>- <span property="yui:type">String</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Success handler on successful copy; Displays an alert/Dialog by default
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: "ClipBoard.copySuccess"
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+                                    <div class="" rel="yui:attribute" resource="#config_tries">
+                                    <h4><a name="config_tries">tries</a>
+                                        <code>- <span property="yui:type">{Number}</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            The no. of times to retry request. Set to 1 for polling kinda stuff
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 2
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+
+                            </div>
+                        </div>
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_ajaxconnection.html" title="AjaxConnection">AjaxConnection</a></li>
+                                <li class=""><a href="module_apiconnection.html" title="APIConnection">APIConnection</a></li>
+                                <li class=""><a href="module_dialogs.html" title="Dialogs">Dialogs</a></li>
+                                <li class=""><a href="module_forio.html" title="Forio">Forio</a></li>
+                                <li class=""><a href="module_forioapi.html" title="Forio.API">Forio.API</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="F.AjaxConnection.html" title="F.AjaxConnection">F.AjaxConnection</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="dialogs.js.html" title="dialogs.js">dialogs.js</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_clone" title="clone">clone</a></li>
+                                <li class="private"><a href="#method_copyFailure" title="copyFailure">copyFailure</a></li>
+                                <li class="private"><a href="#method_copySuccess" title="copySuccess">copySuccess</a></li>
+                                <li class="private"><a href="#method_copyTable" title="copyTable">copyTable</a></li>
+                                <li class=""><a href="#method_init" title="init">init</a></li>
+                                <li class="private"><a href="#method_onInit" title="onInit">onInit</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="configList" class="module">
+                        <h4>Configuration Attributes</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#config_icon" title="icon">icon</a></li>
+                                <li class=""><a href="#config_onFailure" title="onFailure">onFailure</a></li>
+                                <li class=""><a href="#config_onSuccess" title="onSuccess">onSuccess</a></li>
+                                <li class=""><a href="#config_tries" title="tries">tries</a></li>
+                        </ul>
+                    </div>
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Forio All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "F.AjaxConnection.html#method_clone", "access": "", "host": "F.AjaxConnection", "type": "method", "name": "clone"}, {"url": "F.AjaxConnection.html#method_copyFailure", "access": "private", "host": "F.AjaxConnection", "type": "method", "name": "copyFailure"}, {"url": "F.AjaxConnection.html#method_copySuccess", "access": "private", "host": "F.AjaxConnection", "type": "method", "name": "copySuccess"}, {"url": "F.AjaxConnection.html#method_copyTable", "access": "private", "host": "F.AjaxConnection", "type": "method", "name": "copyTable"}, {"url": "F.AjaxConnection.html#config_icon", "access": "", "host": "F.AjaxConnection", "type": "config", "name": "icon"}, {"url": "F.AjaxConnection.html#method_init", "access": "", "host": "F.AjaxConnection", "type": "method", "name": "init"}, {"url": "F.AjaxConnection.html#config_onFailure", "access": "", "host": "F.AjaxConnection", "type": "config", "name": "onFailure"}, {"url": "F.AjaxConnection.html#method_onInit", "access": "private", "host": "F.AjaxConnection", "type": "method", "name": "onInit"}, {"url": "F.AjaxConnection.html#config_onSuccess", "access": "", "host": "F.AjaxConnection", "type": "config", "name": "onSuccess"}, {"url": "F.AjaxConnection.html#config_tries", "access": "", "host": "F.AjaxConnection", "type": "config", "name": "tries"}];
+</script>
+</body>
+</html>
