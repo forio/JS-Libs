@@ -1,0 +1,506 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: Utils  F.Forio  </title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://www.forio.com/tools/js" title="Forio Javascript Library">Forio Javascript Library</a></h1>
+        <h3>Utils&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Forio Javascript Library">Forio Javascript Library</a> 
+            &gt; <a href="./module_utils.html" title="Utils">Utils</a>
+                 &gt; F.Forio 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        <code>static</code>
+                        
+                            Class <b property="yui:name">F.Forio</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        
+                    </div>
+
+                    
+                    <div rel="yui:properties" resource="#properties">
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_isArray">
+                                    <h4>
+                                        <a name="method_isArray">isArray</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isArray</strong>
+                                           (
+                                                
+                                                        
+                                                         Pass
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs are arrays; fails if any of the params aren't
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">Pass</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> in as many inputs you want to check</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_isElement">
+                                    <h4>
+                                        <a name="method_isElement">isElement</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isElement</strong>
+                                           (
+                                                
+                                                        
+                                                         o
+                                                    
+                                                
+                                                        , 
+                                                         type
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs is HTMLElement
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">o</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> Item to check</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">type</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> pass in type to add an additional level of constraint checking; defaults to 'any'</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_isEmpty">
+                                    <h4>
+                                        <a name="method_isEmpty">isEmpty</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isEmpty</strong>
+                                           (
+                                                
+                                                        
+                                                         0
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs is 'emtpy', as opposed to undefined; i.e blank strings, empty objects, 0 elem arrays
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">0</span>
+                                                        &lt;<span property="yui:type">*</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> input to check</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_isNumber">
+                                    <h4>
+                                        <a name="method_isNumber">isNumber</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isNumber</strong>
+                                           (
+                                                
+                                                        
+                                                         Pass
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs are numbers; fails if any of the params aren't
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">Pass</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> in as many inputs you want to check</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_isObject">
+                                    <h4>
+                                        <a name="method_isObject">isObject</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isObject</strong>
+                                           (
+                                                
+                                                        
+                                                         Pass
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs are strings; fails if any of the params aren't
+Does NOT return true for objects created with new keyword or anything but obj literals
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">Pass</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> in as many inputs you want to check</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_isString">
+                                    <h4>
+                                        <a name="method_isString">isString</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Boolean
+                                            <strong property="yui:name">isString</strong>
+                                           (
+                                                
+                                                        
+                                                         Pass
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Check if inputs are strings; fails if any of the params aren't
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">Pass</span>
+                                                        &lt;<span property="yui:type">String</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> in as many inputs you want to check</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_makeObject">
+                                    <h4>
+                                        <a name="method_makeObject">makeObject</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        Object
+                                            <strong property="yui:name">makeObject</strong>
+                                           (
+                                                
+                                                        
+                                                         paramList
+                                                    
+                                                
+                                                        , 
+                                                         options
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Converts anything to an object literal
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">paramList</span>
+                                                        &lt;<span property="yui:type">String||HTMLElement||Object||Array</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> input to convert</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">options</span>
+                                                        &lt;<span property="yui:type">Object</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description"> @see makeQueryString</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+                        <div class="section field details">
+                            <h3 id="configattributes">Configuration Attributes</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:attribute" resource="#config_{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there">
+                                    <h4><a name="config_{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there">{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there</a>
+                                        <code>- <span property="yui:type">object</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Converts anything to a url-ready string
+                                        </div>
+                                    </div>
+ 
+     
+
+                                    <hr />
+                                    </div>        
+
+                            </div>
+                        </div>
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class=""><a href="module_connection.html" title="Connection">Connection</a></li>
+                                <li class=""><a href="module_forioapi.html" title="Forio.API">Forio.API</a></li>
+                                <li class="selected"><a href="module_utils.html" title="Utils">Utils</a></li>
+                                <li class=""><a href="module_widgets.html" title="Widgets">Widgets</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="F.Array.html" title="F.Array">F.Array</a></li>
+                                <li class="selected"><a href="F.Forio.html" title="F.Forio">F.Forio</a></li>
+                                <li class=""><a href="F.Net.html" title="F.Net">F.Net</a></li>
+                                <li class=""><a href="F.Object.html" title="F.Object">F.Object</a></li>
+                                <li class=""><a href="F.String.html" title="F.String">F.String</a></li>
+                                <li class=""><a href="F.XML.html" title="F.XML">F.XML</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="clipboard.js.html" title="clipboard.js">clipboard.js</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_isArray" title="isArray">isArray</a></li>
+                                <li class=""><a href="#method_isElement" title="isElement">isElement</a></li>
+                                <li class=""><a href="#method_isEmpty" title="isEmpty">isEmpty</a></li>
+                                <li class=""><a href="#method_isNumber" title="isNumber">isNumber</a></li>
+                                <li class=""><a href="#method_isObject" title="isObject">isObject</a></li>
+                                <li class=""><a href="#method_isString" title="isString">isString</a></li>
+                                <li class=""><a href="#method_makeObject" title="makeObject">makeObject</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="configList" class="module">
+                        <h4>Configuration Attributes</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#config_{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there" title="{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there">{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there</a></li>
+                        </ul>
+                    </div>
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+       <!-- Copyright &copy; 2010 Forio All rights reserved. -->
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "F.Forio.html#method_isArray", "access": "", "host": "F.Forio", "type": "method", "name": "isArray"}, {"url": "F.Forio.html#method_isElement", "access": "", "host": "F.Forio", "type": "method", "name": "isElement"}, {"url": "F.Forio.html#method_isEmpty", "access": "", "host": "F.Forio", "type": "method", "name": "isEmpty"}, {"url": "F.Forio.html#method_isNumber", "access": "", "host": "F.Forio", "type": "method", "name": "isNumber"}, {"url": "F.Forio.html#method_isObject", "access": "", "host": "F.Forio", "type": "method", "name": "isObject"}, {"url": "F.Forio.html#method_isString", "access": "", "host": "F.Forio", "type": "method", "name": "isString"}, {"url": "F.Forio.html#method_makeObject", "access": "", "host": "F.Forio", "type": "method", "name": "makeObject"}, {"url": "F.Forio.html#config_{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there", "access": "", "host": "F.Forio", "type": "config", "name": "{String} prefix 'D_' or something to append to every item in the list. Doesn't add if already there"}];
+</script>
+</body>
+</html>

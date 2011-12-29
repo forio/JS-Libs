@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: Net   AdminApi.js </title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://www.forio.com/tools/js" title="Forio Javascript Library">Forio Javascript Library</a></h1>
+        <h3>Net&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Forio Javascript Library">Forio Javascript Library</a> 
+            &gt; <a href="./module_net.html" title="Net">Net</a>
+                
+                 &gt; AdminApi.js (source view) 
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <div id="srcout">
+                        <style>
+                            #doc3 .classopts { display:none; }
+                        </style>
+                        <div class="highlight"><pre><span class="cm">/**  Archive API operations. </span>
+<span class="cm"> *  See http://sites.google.com/a/forio.com/documentation/api-documentation/api-archive for list of supported params</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Archive</span>
+<span class="cm"> *  @namespace F.API</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">UserGroup</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;usergroup&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="nx">add</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">userList</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">onError</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">message</span><span class="p">){</span>
+					<span class="nx">callback</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+			
+			<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">action</span><span class="o">:</span> <span class="s2">&quot;addUsers&quot;</span><span class="p">,</span>
+				<span class="nx">content</span><span class="o">:</span> <span class="nx">userList</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span> <span class="c1">//Dry run to see if there are any errors</span>
+		<span class="p">},</span>
+		
+		<span class="nx">setPermission</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="nx">setRunLimit</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			
+		<span class="p">},</span>
+		<span class="nx">clearRunCount</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){</span>
+			
+		<span class="p">},</span>
+		<span class="cm">/** Email lost passwords. For use by admins</span>
+<span class="cm">		 * @param {String} loginid login of user to retreive for</span>
+<span class="cm">		 * @param {Function} callback function (optional)</span>
+<span class="cm">		 * @param {*} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">sendPassword</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">loginid</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="s2">&quot;action=emailUserPasswords&amp;user=&quot;</span> <span class="o">+</span> <span class="nx">loginid</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">qs</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="nx">setRoles</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">group</span><span class="p">,</span> <span class="nx">roles</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="s2">&quot;action=setRoles&amp;value=&quot;</span> <span class="o">+</span> <span class="nx">roles</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span> <span class="o">+</span><span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">group</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">qs</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">File</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="nx">getList</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+					<span class="kd">var</span> <span class="nx">files</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">files</span><span class="p">;</span>
+					<span class="p">(</span><span class="nx">callback</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">)(</span><span class="nx">files</span><span class="p">);</span>
+				<span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Email</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="nx">send</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">body</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="p">{</span><span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">subject</span><span class="o">:</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">body</span><span class="o">:</span> <span class="nx">body</span><span class="p">};</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="nx">sendFile</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">filepath</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="p">{</span><span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">subject</span><span class="o">:</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">file</span><span class="o">:</span> <span class="nx">filepath</span><span class="p">};</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">qs</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+</pre></div>
+
+                    </div>
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class=""><a href="module_api.html" title="API">API</a></li>
+                                <li class="selected"><a href="module_net.html" title="Net">Net</a></li>
+                                <li class=""><a href="module_utils.html" title="Utils">Utils</a></li>
+                                <li class=""><a href="module_widgets.html" title="Widgets">Widgets</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="AjaxConnection.html" title="AjaxConnection">AjaxConnection</a></li>
+                                <li class=""><a href="F.API.APIConnection.html" title="F.API.APIConnection">F.API.APIConnection</a></li>
+                                <li class=""><a href="F.API.Archive.html" title="F.API.Archive">F.API.Archive</a></li>
+                                <li class=""><a href="PollingConnection.html" title="PollingConnection">PollingConnection</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class="selected"><a href="AdminApi.js.html" title="AdminApi.js">AdminApi.js</a></li>
+                                <li class=""><a href="Api.js.html" title="Api.js">Api.js</a></li>
+                                <li class=""><a href="utils.js.html" title="utils.js">utils.js</a></li>
+                        </ul>
+                    </div>
+
+
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+       <!-- Copyright &copy; 2010 Forio All rights reserved. -->
+	</div>
+</div>
+<script type="text/javascript">
+
+    var ALL_YUI_PROPS = [{"url": "AjaxConnection.html#config_allowRedirect", "access": "", "host": "AjaxConnection", "type": "config", "name": "allowRedirect"}, {"url": "PollingConnection.html#method_cancel", "access": "", "host": "PollingConnection", "type": "method", "name": "cancel"}, {"url": "AjaxConnection.html#method_connect", "access": "", "host": "AjaxConnection", "type": "method", "name": "connect"}, {"url": "AjaxConnection.html#method_get", "access": "", "host": "AjaxConnection", "type": "method", "name": "get"}, {"url": "AjaxConnection.html#method_getHTML", "access": "", "host": "AjaxConnection", "type": "method", "name": "getHTML"}, {"url": "AjaxConnection.html#method_getJSON", "access": "", "host": "AjaxConnection", "type": "method", "name": "getJSON"}, {"url": "PollingConnection.html#method_init", "access": "", "host": "PollingConnection", "type": "method", "name": "init"}, {"url": "PollingConnection.html#config_interval", "access": "", "host": "PollingConnection", "type": "config", "name": "interval"}, {"url": "PollingConnection.html#config_matchAny", "access": "", "host": "PollingConnection", "type": "config", "name": "matchAny"}, {"url": "AjaxConnection.html#config_onComplete", "access": "", "host": "AjaxConnection", "type": "config", "name": "onComplete"}, {"url": "AjaxConnection.html#config_onError", "access": "", "host": "AjaxConnection", "type": "config", "name": "onError"}, {"url": "PollingConnection.html#config_onPulse", "access": "", "host": "PollingConnection", "type": "config", "name": "onPulse"}, {"url": "AjaxConnection.html#config_onSuccess", "access": "", "host": "AjaxConnection", "type": "config", "name": "onSuccess"}, {"url": "PollingConnection.html#config_onSuccess", "access": "", "host": "PollingConnection", "type": "config", "name": "onSuccess"}, {"url": "AjaxConnection.html#config_parameterParser", "access": "", "host": "AjaxConnection", "type": "config", "name": "parameterParser"}, {"url": "PollingConnection.html#config_params", "access": "", "host": "PollingConnection", "type": "config", "name": "params"}, {"url": "AjaxConnection.html#method_post", "access": "", "host": "AjaxConnection", "type": "method", "name": "post"}, {"url": "AjaxConnection.html#config_preloadCondition", "access": "", "host": "AjaxConnection", "type": "config", "name": "preloadCondition"}, {"url": "AjaxConnection.html#config_reconnectInterval", "access": "", "host": "AjaxConnection", "type": "config", "name": "reconnectInterval"}, {"url": "F.API.Archive.html#method_sendPassword", "access": "", "host": "F.API.Archive", "type": "method", "name": "sendPassword"}, {"url": "F.API.APIConnection.html#config_target", "access": "", "host": "F.API.APIConnection", "type": "config", "name": "target"}, {"url": "AjaxConnection.html#config_tries", "access": "", "host": "AjaxConnection", "type": "config", "name": "tries"}];
+</script>
+</body>
+</html>

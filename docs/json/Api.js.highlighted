@@ -1,0 +1,546 @@
+<div class="highlight"><pre><span class="cm">/**</span>
+<span class="cm"> * @module Net</span>
+<span class="cm"> * @author Naren</span>
+<span class="cm"> */</span>
+
+<span class="cm">/** Wrapper around AjaxConnection specifically for talking to any Simulate API</span>
+<span class="cm"> * @class APIConnection</span>
+<span class="cm"> * @constructor</span>
+<span class="cm"> * @extends AjaxConnection</span>
+<span class="cm"> * @requires AjaxConnection, F, F.APIUtils</span>
+<span class="cm"> * @param {String} url API location</span>
+<span class="cm"> * @param {String|Array|Object|HTMLElem|Mixed} params  URLParams to be included as part of the url string</span>
+<span class="cm"> * @param {Object} settings Additional settings to be passed to ajax conn object. Use to define error handlers</span>
+<span class="cm"> */</span>
+<span class="kd">var</span> <span class="nx">APIConnection</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="nx">settings</span><span class="p">){</span>
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">url</span><span class="p">){</span>
+		<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;APIConnection: no url provided&quot;</span><span class="p">);</span>
+	<span class="p">}</span>
+	
+	<span class="kd">var</span> <span class="nx">dataType</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">;</span> <span class="c1">//Api returns json unless diff target file specified</span>
+	<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="cm">/** Return this file on success</span>
+<span class="cm">		 * @config target</span>
+<span class="cm">		 * @type String</span>
+<span class="cm">		 */</span>
+		<span class="nx">target</span><span class="o">:</span> <span class="s2">&quot;&quot;</span>
+	<span class="p">}</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">params</span><span class="p">);</span>
+	
+	<span class="k">if</span><span class="p">(</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">target</span><span class="p">){</span>
+		<span class="kd">var</span> <span class="nx">absURL</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">userPath</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">simPath</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">params</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+		<span class="nx">params</span><span class="p">.</span><span class="nx">target</span> <span class="o">=</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">absURL</span><span class="p">);</span>
+		
+		<span class="nx">dataType</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span><span class="p">;</span> <span class="c1">//We don&#39;t know what target file content will be any longer</span>
+	<span class="p">}</span>
+	<span class="nx">url</span> <span class="o">+=</span> <span class="s2">&quot;?&quot;</span> <span class="o">+</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="p">{</span><span class="nx">encode</span><span class="o">:</span><span class="kc">false</span><span class="p">});</span> <span class="c1">// Make escaped target a part of url</span>
+	
+	<span class="c1">//TODO: Find someway to specify default error handlers</span>
+	<span class="kd">var</span> <span class="nx">defaultErrorHandler</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">){</span>
+		<span class="nx">$</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+	<span class="p">};</span>
+	<span class="kd">var</span> <span class="nx">authErrorHandler</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">){</span>
+		<span class="nb">window</span><span class="p">.</span><span class="nx">location</span> <span class="o">=</span> <span class="s2">&quot;index.html&quot;</span><span class="p">;</span>
+	<span class="p">};</span>
+	
+	<span class="kd">var</span> <span class="nx">handleError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">message</span><span class="p">){</span>
+		<span class="k">switch</span><span class="p">(</span><span class="nx">status</span><span class="p">){</span>
+			<span class="k">case</span> <span class="mi">401</span><span class="o">:</span> 
+				<span class="nx">authErrorHandler</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="k">default</span><span class="o">:</span>
+				<span class="nx">defaultErrorHandler</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+				<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	
+	<span class="kd">var</span> <span class="nx">defaultSettings</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="nx">onError</span><span class="o">:</span> <span class="nx">handleError</span><span class="p">,</span>
+		<span class="nx">parameterParser</span><span class="o">:</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span>
+	<span class="p">}</span>
+	<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaultSettings</span><span class="p">,</span> <span class="nx">settings</span><span class="p">);</span>
+	
+	<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span>  <span class="k">new</span> <span class="nx">AjaxConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">defaultSettings</span><span class="p">,</span> <span class="p">{</span><span class="nx">dataType</span><span class="o">:</span> <span class="nx">dataType</span><span class="p">});</span>
+		<span class="nx">ac</span><span class="p">.</span><span class="nx">put</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">type</span><span class="o">:</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;POST&#39;</span> <span class="o">:</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>
+				<span class="nx">data</span><span class="o">:</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&amp;method=put&quot;</span><span class="p">,</span>
+				<span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaultSettings</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		<span class="nx">ac</span><span class="p">.</span><span class="nx">del</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">type</span><span class="o">:</span> <span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;POST&#39;</span> <span class="o">:</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>
+				<span class="nx">data</span><span class="o">:</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">params</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&amp;method=delete&quot;</span><span class="p">,</span>
+				<span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span>
+			<span class="p">}</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaultSettings</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">ac</span><span class="p">;</span>
+<span class="p">};</span>
+
+
+<span class="cm">/** Adpators to perform operations on all Forio APIs.</span>
+<span class="cm"> * @module API</span>
+<span class="cm"> * @see http://sites.google.com/a/forio.com/documentation/api-documentation</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="cm">/** Utility functions for the API adaptors</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class APIUtils</span>
+<span class="cm"> *  @namespace F</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span> <span class="o">=</span>  <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	
+	<span class="cm">/* We need the following because the simulate URL structure changed (9/2010).  </span>
+<span class="cm">	 * First we need to determine whether we need to use the old URL regexp or the new URL regexp.</span>
+<span class="cm">	 * Next we need to use the proper regexp to breakup the url of the current page</span>
+<span class="cm">	 */</span>
+	<span class="kd">var</span> <span class="nx">urlRegExp</span><span class="p">;</span>
+	
+	<span class="c1">//http://forio.com/simulate/simulation/cdc/health-bound/abc.swf</span>
+	<span class="kd">var</span> <span class="nx">simRegExpOld</span> <span class="o">=</span> <span class="sr">/(http|https|file):\/\/([^\/]+)\/([^\/]+)\/simulation\/([^\/]+)\/([^\/]+)\/?/</span><span class="p">;</span>
+	<span class="c1">//http://forio.com/simulate/cdc/health-bound/simulation/abc.swf</span>
+	<span class="kd">var</span> <span class="nx">simRegExpNew</span> <span class="o">=</span> <span class="sr">/(http|https|file):\/\/([^\/]+)\/([^\/]+)\/([^\/]+)\/([^\/]+)\/simulation\/?/</span><span class="p">;</span>
+	<span class="c1">//http://forio.com/simulate</span>
+	<span class="kd">var</span> <span class="nx">managerRegExp</span> <span class="o">=</span> <span class="sr">/(http|https|file):\/\/([^\/]+)\/([^\/]+)\/?/</span><span class="p">;</span>
+	
+	<span class="kd">var</span> <span class="nx">usingManagerRegExp</span> <span class="o">=</span> <span class="kc">false</span>
+	<span class="c1">//need to flag when using manager one because it will not return a userPath or simPath</span>
+	<span class="k">if</span><span class="p">(</span><span class="nx">simRegExpNew</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">))</span>
+	<span class="p">{</span>
+		<span class="nx">urlRegExp</span> <span class="o">=</span> <span class="nx">simRegExpNew</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">simRegExpOld</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">))</span>
+	<span class="p">{</span>
+		<span class="nx">urlRegExp</span> <span class="o">=</span> <span class="nx">simRegExpOld</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="nx">usingManagerRegExp</span><span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="nx">urlRegExp</span> <span class="o">=</span> <span class="nx">managerRegExp</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">urlRegExp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">)</span> <span class="o">||</span> <span class="p">[];</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Protocol used</span>
+<span class="cm">		 * @property protocol</span>
+<span class="cm">		 * @type String </span>
+<span class="cm">		 */</span>
+		<span class="nx">protocol</span><span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+		
+		<span class="nx">basePath</span> <span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;://&quot;</span> <span class="o">+</span> <span class="nx">result</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+		
+		<span class="cm">/** Domain of the sim</span>
+<span class="cm">		 * @property domain</span>
+<span class="cm">		 * @type String</span>
+<span class="cm">		 */</span>
+		<span class="nx">domain</span><span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+		
+		<span class="cm">/** section of URL referencing simulate </span>
+<span class="cm">		 * @property simulatePath</span>
+<span class="cm">		 * @type String </span>
+<span class="cm">		 */</span>
+		<span class="nx">simulatePath</span> <span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+		
+		<span class="cm">/** Simulation author</span>
+<span class="cm">		 * @property userPath</span>
+<span class="cm">		 * @type String </span>
+<span class="cm">		 */</span>
+		<span class="nx">userPath</span> <span class="o">:</span> <span class="nx">usingManagerRegExp</span> <span class="o">?</span> <span class="s2">&quot;&quot;</span> <span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+		
+		<span class="cm">/** Simulation name</span>
+<span class="cm">		 * @property simPath</span>
+<span class="cm">		 * @type String Name of sim </span>
+<span class="cm">		 */</span>
+		<span class="nx">simPath</span> <span class="o">:</span> <span class="nx">usingManagerRegExp</span> <span class="o">?</span> <span class="s2">&quot;&quot;</span> <span class="o">:</span> <span class="nx">result</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+		
+		<span class="cm">/** Enter in api type to get url</span>
+<span class="cm">		 * @param {String} apiType  Currently run||archive||data||auth</span>
+<span class="cm">		 * @return {String} absolute path to API</span>
+<span class="cm">		 */</span>
+		<span class="nx">getURL</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">apiType</span><span class="p">){</span>
+			<span class="c1">// TODO: this API needs to be refactored as now it assumes it is only being used with Sim Urls</span>
+			<span class="c1">//if(usingManagerRegExp)</span>
+				<span class="c1">//throw &quot;You are trying to get a URL that requires being in a simulation when you are only in the manager&quot;;</span>
+			
+			<span class="kd">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">me</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="s2">&quot;://&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">domain</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">simulatePath</span> <span class="o">+</span> <span class="s2">&quot;/api/&quot;</span> <span class="o">+</span> <span class="nx">apiType</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">userPath</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">simPath</span><span class="p">;</span>
+			<span class="k">return</span> <span class="nx">url</span><span class="p">;</span>
+		<span class="p">},</span>
+	
+		<span class="nx">getNonSimURL</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">apiType</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">me</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">me</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="s2">&quot;://&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">domain</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">me</span><span class="p">.</span><span class="nx">simulatePath</span> <span class="o">+</span> <span class="s2">&quot;/api/&quot;</span> <span class="o">+</span> <span class="nx">apiType</span><span class="p">;</span>
+			<span class="k">return</span> <span class="nx">url</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="cm">/** Perform operations on the Data API</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Data</span>
+<span class="cm"> *  @namespace F.API</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Data</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">isKeyValid</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">){</span>
+		<span class="c1">//A-Z and a-z, digits 0-9, an underscore, or a dash</span>
+		<span class="c1">//TODO: Regex this</span>
+		<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+	<span class="p">}</span>
+	
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Save values to the data API. Assume object is single tuple as in &quot;a=b&quot; or &quot;{a:b}&quot; which posts &#39;b&#39; to &lt;URL&gt;/a</span>
+<span class="cm">		 * @param {Mixed} params stuff to save</span>
+<span class="cm">		 */</span>
+		<span class="nx">save</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="nx">params</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">params</span><span class="p">);</span>
+			<span class="kd">var</span> <span class="nx">dataKey</span><span class="p">,</span> <span class="nx">dataVal</span><span class="p">;</span>
+			<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="nx">params</span><span class="p">){</span> <span class="c1">//Assume object just has the one key</span>
+				<span class="nx">dataKey</span> <span class="o">=</span> <span class="nx">prop</span><span class="p">;</span>
+				<span class="nx">dataVal</span> <span class="o">=</span> <span class="nx">param</span><span class="p">[</span><span class="nx">prop</span><span class="p">];</span>
+			<span class="p">}</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">saveAs</span><span class="p">(</span><span class="nx">dataKey</span><span class="p">,</span> <span class="nx">dataVal</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="c1">//TODO: simulate auto unescapes stuff before passing it on- replace &quot; with /&quot;</span>
+		<span class="cm">/** Saves values to the specified key. Supports complicated object structures</span>
+<span class="cm">		 * @param {String} key Key to save data under</span>
+<span class="cm">		 * @param {*} value things to save</span>
+<span class="cm">		 * @param {Function} callback function (optional)</span>
+<span class="cm">		 * @param {*} options (optional)</span>
+<span class="cm">		 * </span>
+<span class="cm">		 */</span>
+		<span class="nx">saveAs</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">isKeyValid</span><span class="p">(</span><span class="nx">key</span><span class="p">)){</span>
+				<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Data.save: Invalid key &quot;</span> <span class="o">+</span> <span class="nx">key</span> <span class="p">);</span>
+			<span class="p">}</span>
+			
+			<span class="kd">var</span> <span class="nx">dataVal</span><span class="p">;</span>
+			<span class="k">try</span><span class="p">{</span>
+				<span class="nx">dataVal</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nb">Object</span><span class="p">.</span><span class="nx">serialize</span><span class="p">(</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeObject</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">);</span> <span class="c1">//Are we posting an object</span>
+			<span class="p">}</span>
+			<span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">F</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">value</span><span class="p">)){</span> <span class="c1">//WE&#39;re just posting the value directly</span>
+					<span class="nx">dataVal</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+				<span class="p">}</span>
+				<span class="k">else</span><span class="p">{</span>
+					<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Data API: unknown value format&quot;</span><span class="p">);</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+			<span class="c1">//UGH: simulate gotcha no.12312: What? You want case insensitive url params? surely you jest</span>
+			<span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span>  <span class="s2">&quot;data_action=SETPROPERTY&amp;value=&quot;</span> <span class="o">+</span> <span class="nx">dataVal</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="o">+</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">options</span><span class="p">,</span> <span class="p">{</span><span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span><span class="p">});</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Load data from the API</span>
+<span class="cm">		 * @param {String} key location to load data from</span>
+<span class="cm">		 * @param {Function} callback - Gets called with data object</span>
+<span class="cm">		 * @param {*} options</span>
+<span class="cm">		 */</span>
+		<span class="nx">load</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+					<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+					<span class="p">(</span><span class="nx">callback</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">)(</span><span class="nx">data</span><span class="p">);</span>
+				<span class="p">});</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Removes items from the data API</span>
+<span class="cm">		 * @param {String} key location to delete</span>
+<span class="cm">		 * @param {Function} callback </span>
+<span class="cm">		 * @param {*} options</span>
+<span class="cm">		 */</span>
+		<span class="nx">remove</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">&quot;method=Delete&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+					<span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+					<span class="p">(</span><span class="nx">callback</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">)(</span><span class="nx">data</span><span class="p">);</span>
+				<span class="p">});</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Generic connection handler, does no params by default</span>
+<span class="cm">		 * @param {String} key</span>
+<span class="cm">		 * @param {*} params params to post</span>
+<span class="cm">		 * @param {Function} callback </span>
+<span class="cm">		 * @param {*} options</span>
+<span class="cm">		 */</span>
+		<span class="nx">connect</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+					<span class="p">(</span><span class="nx">callback</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">)(</span><span class="nx">response</span><span class="p">);</span>
+				<span class="p">});</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="cm">/** Perform operations on runs</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Run</span>
+<span class="cm"> *  @namespace F.API</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Run</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;run&quot;</span><span class="p">);</span>
+
+	<span class="k">return</span> <span class="p">{</span>
+		<span class="cm">/** Save Decisions</span>
+<span class="cm">		 * @param {Mixed} values values to save</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">saveValues</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Set properties of current run; name, desc, etc</span>
+<span class="cm">		 * @param {Mixed} properties properties to set, can take multiple</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">setProperties</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="nx">properties</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="p">{</span><span class="nx">seperator</span><span class="o">:</span> <span class="s2">&quot;:&quot;</span><span class="p">});</span>
+			<span class="kd">var</span> <span class="nx">propQs</span><span class="o">=</span> <span class="p">{</span>
+				<span class="s2">&quot;run_set&quot;</span> <span class="o">:</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">propQs</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Perform run actions; step, clone etc</span>
+<span class="cm">		 * @param {String||Array} actions one or more actions to set</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">doActions</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">actions</span><span class="p">,</span> <span class="nx">runid</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">actionsQs</span><span class="o">=</span> <span class="p">{</span>
+				<span class="s2">&quot;run_action&quot;</span> <span class="o">:</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">actions</span><span class="p">),</span>
+				<span class="s2">&quot;run&quot;</span><span class="o">:</span> <span class="nx">runid</span>
+			<span class="p">}</span>
+			
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">actionsQs</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Get Information about current run</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return callback({Object}) the run object</span>
+<span class="cm">		 */</span>
+		<span class="nx">getInfo</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span> <span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Generic connection handler, does no params by default</span>
+<span class="cm">		 * @param {String} key</span>
+<span class="cm">		 * @param {*} params params to post</span>
+<span class="cm">		 * @param {Function} callback </span>
+<span class="cm">		 * @param {*} options</span>
+<span class="cm">		 */</span>
+		<span class="nx">connect</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="c1">//Common Actions</span>
+		<span class="cm">/** Clone run. Use &#39;target&#39; param to point to a file with $Run.RunId to make it return new RunId</span>
+<span class="cm">		 * @param {String} runId the run to clone</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">clone</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">runId</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">runId</span><span class="p">){</span>
+				<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Run.clone: No source run provided&quot;</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">doActions</span><span class="p">(</span><span class="s2">&quot;clone&quot;</span><span class="p">,</span> <span class="nx">runId</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Reset run to initial</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">reset</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">doActions</span><span class="p">(</span><span class="s2">&quot;reset&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Advance Run. Just do doActions(&quot;step&quot;) if you just want to step once. Same as &quot;doActions(&#39;step_to_x&#39;)&quot;</span>
+<span class="cm">		 * @param {String || Number} step the step to advance to</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 */</span>
+		<span class="nx">stepTo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">step</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">step</span><span class="p">){</span>
+				<span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s2">&quot;Run.stepTo: No step provided&quot;</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">doActions</span><span class="p">(</span><span class="s2">&quot;step_to_&quot;</span><span class="o">+</span> <span class="nx">step</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="cm">/** Handles Authentication.</span>
+<span class="cm"> *  @class Auth</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @namespace F.API</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Auth</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;authentication&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Login to the simulation</span>
+<span class="cm">		 * @param {String} email </span>
+<span class="cm">		 * @param {String} password</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return {}</span>
+<span class="cm">		 */</span>
+		<span class="nx">login</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">email</span><span class="p">,</span><span class="nx">password</span><span class="p">,</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="s2">&quot;user_action=login&amp;email=&quot;</span> <span class="o">+</span> <span class="nx">email</span> <span class="o">+</span> <span class="s2">&quot;&amp;password=&quot;</span> <span class="o">+</span> <span class="nx">password</span><span class="p">;</span>
+			
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span>
+				<span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+				<span class="nx">onError</span><span class="o">:</span> <span class="nx">callback</span> <span class="c1">//Call the login handler anyway with the status code</span>
+			<span class="p">};</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">params</span> <span class="p">,</span> <span class="nx">defaults</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Logout from the simulation</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return {}</span>
+<span class="cm">		 */</span>
+		<span class="nx">logout</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="s2">&quot;user_action=logout&quot;</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="nx">parameterParser</span><span class="o">:</span> <span class="kc">null</span><span class="p">};</span>
+			<span class="nx">$</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">defaults</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">.</span><span class="nx">params</span><span class="p">,</span> <span class="nx">defaults</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Check if you&#39;re currently logged in</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return callback({Boolean})</span>
+<span class="cm">		 */</span>
+		<span class="nx">isUserLoggedIn</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">response</span><span class="p">){</span>
+					<span class="p">(</span><span class="nx">callback</span> <span class="o">||</span> <span class="nx">$</span><span class="p">.</span><span class="nx">noop</span><span class="p">)(</span><span class="nx">response</span> <span class="o">&amp;&amp;</span> <span class="nx">response</span><span class="p">.</span><span class="nx">canRunSim</span><span class="p">);</span>				
+				<span class="p">});</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Information about currently logged-in user</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return callback({Object}) Object representing user info</span>
+<span class="cm">		 */</span>
+		<span class="nx">getUserInfo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Emails the password to the registered email. 410 status code if not found.</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return callback({Object}) Object representing user info</span>
+<span class="cm">		 */</span>
+		<span class="nx">sendPassword</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">loginid</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">qs</span> <span class="o">=</span> <span class="s2">&quot;user_action=emailUserPassword&amp;email=&quot;</span> <span class="o">+</span> <span class="nx">loginid</span><span class="p">;</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">qs</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="cm">/**  Archive API operations. </span>
+<span class="cm"> *  See http://sites.google.com/a/forio.com/documentation/api-documentation/api-archive for list of supported params</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Archive</span>
+<span class="cm"> *  @namespace F.API</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Archive</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getURL</span><span class="p">(</span><span class="s2">&quot;archive&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+		<span class="cm">/** Remove a run from Archive. Same as setting the &quot;Saved&quot; property of the run to true through Run API</span>
+<span class="cm">		 * @param {String|Array} runId runs to remove</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return {}</span>
+<span class="cm">		 */</span>
+		<span class="nx">remove</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">runId</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span>  <span class="p">{</span>
+				<span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span>
+				<span class="nx">run</span><span class="o">:</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">runId</span><span class="p">)</span>
+			<span class="p">}</span>
+			
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Get all archived runs. </span>
+<span class="cm">		 * @param {Mixed} filter Filter runs from the api (Optional)</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return {} </span>
+<span class="cm">		 */</span>
+		<span class="nx">getRuns</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="cm">/** Generic connection handler, does no params by default</span>
+<span class="cm">		 * @param {String} key</span>
+<span class="cm">		 * @param {*} params params to post</span>
+<span class="cm">		 * @param {Function} callback </span>
+<span class="cm">		 * @param {*} options</span>
+<span class="cm">		 */</span>
+		<span class="nx">connect</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">},</span>
+		
+		<span class="nx">setProperties</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">runId</span><span class="p">,</span> <span class="nx">properties</span><span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+			<span class="nx">properties</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">makeQueryString</span><span class="p">(</span><span class="nx">properties</span><span class="p">,</span> <span class="p">{</span><span class="nx">seperator</span><span class="o">:</span> <span class="s2">&quot;:&quot;</span><span class="p">});</span>
+			<span class="kd">var</span> <span class="nx">propQs</span><span class="o">=</span> <span class="p">{</span>
+				<span class="s2">&quot;run_set&quot;</span> <span class="o">:</span> <span class="nx">properties</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">),</span>
+				<span class="s2">&quot;run&quot;</span><span class="o">:</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">runId</span><span class="p">)</span>
+			<span class="p">}</span>
+			
+			<span class="nx">ac</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">propQs</span><span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+
+<span class="cm">/**  Simulation API operations. </span>
+<span class="cm"> *  See http://sites.google.com/a/forio.com/documentation/api-documentation/api-simulation for list of supported params</span>
+<span class="cm"> *  @static</span>
+<span class="cm"> *  @class Simulation</span>
+<span class="cm"> *  @namespace F.Simulation</span>
+<span class="cm"> */</span>
+<span class="nx">F</span><span class="p">.</span><span class="nx">API</span><span class="p">.</span><span class="nx">Simulation</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">APIUtils</span><span class="p">.</span><span class="nx">getNonSimURL</span><span class="p">(</span><span class="s2">&quot;simulation&quot;</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">{</span>
+
+		<span class="cm">/** Get simulations matching the filters specified. </span>
+<span class="cm">		 * @param {Mixed} filter Filter runs from the api (Optional)</span>
+<span class="cm">		 * @param {Function} callback (optional)</span>
+<span class="cm">		 * @param {Object} options (optional)</span>
+<span class="cm">		 * @return {} </span>
+<span class="cm">		 */</span>
+		<span class="nx">getSimulations</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">,</span> <span class="nx">options</span><span class="p">){</span>
+			<span class="kd">var</span> <span class="nx">ac</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">APIConnection</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">options</span><span class="p">);</span>
+				<span class="nx">ac</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">filter</span> <span class="p">,</span> <span class="nx">callback</span><span class="p">);</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}());</span>
+</pre></div>
