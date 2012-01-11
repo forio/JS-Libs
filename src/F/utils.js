@@ -38,7 +38,9 @@ var F = function(){
 		
 		var pName = ""; 
 		if(F.isElement(param)){
-			pName = param.name;
+			//You can specify name either with the 'name' field or the model field;
+			
+			pName = $(param).data("model") ? $(param).data("model") : param.name;
 			if(!pName) throw new Error("Error parsing decision name: Element does not have 'name' property.")
 		}
 		else if(F.isObject(param)){
@@ -70,7 +72,39 @@ var F = function(){
 	function _getParamValue(param){
 		var pVal = "";
 		if(F.isElement(param)){
-			pVal = param.value; 
+			//Do slightly more intelligent parsing for checkboxes and radio-buttons
+			if(param.nodeName.toLowerCase() === "input"){
+				var type= param.type.toLowerCase();
+				switch(type){
+					case "checkbox":
+						if(param.checked){
+							pVal = $(param).val();
+						}
+						else{
+							pVal = ($(param).data("false-val") ? $(param).data("false-val"): 0);
+						}
+						break;
+					case "radio":
+						if(param.checked){
+							pVal = $(param).val();
+						}
+						else{
+							pVal = 0;
+							//Why would you save an unchecked radio button? Should I warn?
+							if(console && console.warn) 
+								console.warn(param, "is an unchecked radio button. Saving value as 0");
+						}
+						break;
+					default:
+						pVal = $(param).val(); 
+				}
+			}
+			else{
+				//selects and whatnot
+				pVal = $(param).val(); 
+			}
+			
+			
 			if(pVal === undefined) throw new Error("Error parsing decision value: Element does not have 'value' property.");
 		}
 		else if(F.isObject(param)){
@@ -282,11 +316,19 @@ F.Template = (function(){
 
 F.Number = {
 	extract: function(input){
+		input  = input.replace(/,/g, "");
 		var floatMatcher = /[-+]?[0-9]*\.?[0-9]+/
 		var results = floatMatcher.exec(input + "")[0];
 		return parseFloat(results);
-	}
+	},
 	
+	getRandomSeed: function(from, to, isInteger){
+        if(from === undefined) from = 0;
+        if(to === undefined) to = 1000000000;
+		var rnd =  Math.random() * (to - from + 1) + from;
+		if(isInteger) rnd= Math.floor(rnd);
+		return rnd;
+	}
 }
 /** Stringy functions
  *  @static
