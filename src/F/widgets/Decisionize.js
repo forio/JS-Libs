@@ -188,7 +188,7 @@ F.Decisionize = (function(){
 						var me = this;
 						if(params.animate){
 							$(me).addClass("changed");
-								setTimeout(function(){$(me).removeClass("changed")}, 1500) 
+							setTimeout(function(){$(me).removeClass("changed")}, 1500) 
 						}
 						
 					})
