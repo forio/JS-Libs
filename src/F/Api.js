@@ -542,7 +542,7 @@ F.API.Auth = (function(){
 			var defaults = {
 				parameterParser: null,
 				onError: function(errorMess, errorThrown, responseText){
-					var response = YAHOO.lang.JSON.parse(responseText);
+					var response = $.parseJSON(responseText);
 					callback(response);
 				} //Call the login handler anyway with the status code
 			};
@@ -619,7 +619,7 @@ F.API.Auth = (function(){
 			var defaults = {
 				parameterParser: null,
 				onError: function(errorMess, errorThrown, responseText){
-					var response = YAHOO.lang.JSON.parse(responseText);
+					var response = $.parseJSON(responseText);
 					callback(response);
 				} //Call the login handler anyway with the status code
 			};

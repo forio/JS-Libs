@@ -12,7 +12,6 @@ var F = function(){
 	//Utility fn used by type checkers
 	function is(args, type, testFn){
 		testFn || (testFn = function(o){return  typeof o === type;})
-
 		var isValid = true;
 		for(var i=0; i < args.length; i++){
 			if(testFn(args[i]) !== true){
@@ -81,13 +80,14 @@ var F = function(){
 							pVal = $(param).val();
 						}
 						else{
-							pVal = ($(param).data("false-val") ? $(param).data("false-val"): 0);
+							pVal = ($(param).data("off") ? $(param).data("off"): 0);
 						}
 						break;
 					case "radio":
 						if(param.checked){
 							pVal = $(param).val();
 						}
+						
 						else{
 							pVal = 0;
 							//Why would you save an unchecked radio button? Should I warn?
@@ -315,11 +315,40 @@ F.Template = (function(){
 }())
 
 F.Number = {
-	extract: function(input){
+	extract: function(input, options){
+		var defaultOptions = {
+			skipSuffix: false
+		}
+		$.extend(defaultOptions, options);
+		
 		input  = input.replace(/,/g, "");
-		var floatMatcher = /[-+]?[0-9]*\.?[0-9]+/
-		var results = floatMatcher.exec(input + "")[0];
-		return parseFloat(results);
+		var floatMatcher = /([-+]?[0-9]*\.?[0-9]+)(K?M?B?)/i;
+		var results = floatMatcher.exec(input + "");
+		var number, suffix = "";
+		if(results && results[1]){
+			number = results[1]
+		}
+		if(results && results[2]){
+			suffix = results[2].toLowerCase();
+		}
+		
+		if(!defaultOptions.skipSuffix){
+			switch(suffix){
+				case "k":
+					number = number * 1000;
+					break;
+				case "m":
+					number = number * 1000000;
+					break;
+				case "b":
+					number = number * 1000000000;
+					break;
+				default:
+					number;
+			}
+		}
+		
+		return parseFloat(number);
 	},
 	
 	getRandomSeed: function(from, to, isInteger){
@@ -484,7 +513,7 @@ F.Array = {
 		}
 	    var found = false;
 	    for(var i=0;  i< ipArray.length; i++){
-	        if(value === ipArray[i]){
+	        if($.trim(value) === $.trim(ipArray[i])){
 	            found = true;
 	            break;
 	        }
