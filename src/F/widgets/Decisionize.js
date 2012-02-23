@@ -108,7 +108,7 @@ F.Decisionize = (function(){
 				$.each(listenersForThisVal, function(index, listener){
 					if(isChanged(listener, value)){
 						$(listener).trigger("modelChange", {value: value, run:run, animate: animate});
-						console.log("Triggering model change:", listener, value.label, key);
+						//console.log("Triggering model change:", listener, value.label, key);
 					}
 				});
 			});
@@ -184,7 +184,7 @@ F.Decisionize = (function(){
 					actions.push("update");
 				}
 				//console.log("Actions found", actions, elem);
-				console.log("Triggered", elem, type, params.value.label, actions);
+				//console.log("Triggered", elem, type, params.value.label, actions);
 				//TODO: Make this configureable
 				var CHANGE_CLASS = "changed";
 				var HIDDEN_CLASS = "hidden";

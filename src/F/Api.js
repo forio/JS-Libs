@@ -42,7 +42,7 @@ var APIConnection = function(url, params, settings){
 		var message = errorMessage.message;
 		
 		var authErrorHandler = function(message){
-			window.location = "index.html";
+			window.location = "index.html"; // Hoping you have your index private and simulate redirects you to a login page
 		};
 		
 		var defaultErrorHandler = function(errorMessage, errorThrown){
