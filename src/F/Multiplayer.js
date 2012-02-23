@@ -123,7 +123,7 @@ F.Comet = function(){
 	        $.extend(defaults, options);
 	        
 			cometd.configure(defaultCometOptions);
-	
+		
 			/* /meta/connect is a bayeux-defined comet channel
 			 * Use to listen for error messages from server. E.g: Network error
 			 */

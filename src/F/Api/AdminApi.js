@@ -78,12 +78,25 @@ F.API.UserGroup = (function(){
 				ac.post(params , callback);
 			
 		},
-		setRunLimit: function(){
-			
+		resetRunLimit: function(runLimit, callback, options){
+			var qs = "action=clearRunCount";
+			//TODO: Make simulate do this with the same API call
+			if(runLimit !== undefined && runLimit !== null){
+				var oldcallback = callback;
+				callback = function(){
+					F.API.UserGroup.setRunLimit(runLimit, oldcallback, options);
+				}
+			}
+			var ac = new APIConnection(url, options);
+				ac.post(qs , callback);
 		},
-		clearRunCount: function(){
-			
+		
+		setRunLimit: function(runLimit, callback, options){
+			var qs = "action=setRunLimit&value=" + runLimit;
+			var ac = new APIConnection(url, options);
+				ac.post(qs , callback);
 		},
+		
 		/** Email lost passwords. For use by admins
 		 * @param {String} loginid login of user to retreive for
 		 * @param {Function} callback function (optional)
