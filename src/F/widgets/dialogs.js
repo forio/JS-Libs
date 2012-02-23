@@ -111,7 +111,7 @@ var Dialogs = {
 		
 		var cg = {
 			text: text,
-		    buttons: [ { text:"Ok", handler:function(){
+		    buttons: [ { text:"OK", handler:function(){
 					me._executeFnAndHide(callBackFn);
 				}, 
 				isDefault:true } ]
@@ -165,7 +165,7 @@ var Dialogs = {
 		var defaults = {
 			header: "Confirm",
 			icon: "",
-			okText: "Ok",
+			okText: "OK",
 			onOK: null,
 			cancelText: "Cancel",
 			onCancel: null

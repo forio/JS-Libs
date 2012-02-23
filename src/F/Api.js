@@ -42,12 +42,11 @@ var APIConnection = function(url, params, settings){
 		var message = errorMessage.message;
 		
 		var authErrorHandler = function(message){
-			window.location = "index.html";
+			window.location = "index.html"; // Hoping you have your index private and simulate redirects you to a login page
 		};
 		
 		var defaultErrorHandler = function(errorMessage, errorThrown){
-			var isDevSim = (F.APIUtils.simPath.indexOf("-dev") !== -1 || F.APIUtils.simPath.indexOf("-test") !== -1);
-			if(isDevSim){
+			if(F.API.DEBUG_MODE){
 				if(window.console && window.console.error){
 					window.console.error(errorMessage, errorThrown);
 				}
@@ -102,11 +101,6 @@ var APIConnection = function(url, params, settings){
 };
 
 
-/** Adpators to perform operations on all Forio APIs.
- * @module API
- * @see http://sites.google.com/a/forio.com/documentation/api-documentation
- */
-F.API = {};
 /** Utility functions for the API adaptors
  *  @static
  *  @class APIUtils
@@ -192,6 +186,18 @@ F.APIUtils =  (function(){
 	}
 }());
 
+/** Adpators to perform operations on all Forio APIs.
+ * @module API
+ * @see http://sites.google.com/a/forio.com/documentation/api-documentation
+ */
+F.API = {
+	/** Set to true to avoid posting errors to log api and print to console instead. Defaults to true for dev and test accounts.
+	 * @property DEBUG_MODE
+	 * @type Boolean
+	 */
+	DEBUG_MODE: (F.APIUtils.simPath.indexOf("-dev") !== -1 || F.APIUtils.simPath.indexOf("-test") !== -1)
+};
+
 /** Perform operations on the Data API
  *  @static
  *  @class Data
@@ -237,7 +243,7 @@ F.API.Data = (function(){
 			var dataKey, dataVal;
 			for(var prop in params){ //Assume object just has the one key
 				dataKey = prop;
-				dataVal = param[prop];
+				dataVal = params[prop];
 			}
 			this.saveAs(dataKey, dataVal, callback, options);
 		},
@@ -321,8 +327,6 @@ F.API.Data = (function(){
  */
 F.API.Run = (function(){
 	var url = function(){return F.APIUtils.getURL("run")};
-	var runChangedEvent;
-	
 	//Converts the returns array to a key-value pair for easy js retreival later
 	//IMPROVE: Make simulate do this for you;
 	var prettifyValsArray = function(valsArray){
@@ -343,20 +347,14 @@ F.API.Run = (function(){
 		return variableList;
 	}
 	
-	if(YAHOO){
-		runChangedEvent  = new YAHOO.util.CustomEvent("runChangedEvent", this, true, YAHOO.util.CustomEvent.FLAT);
-	}
-	
 	return {
-		change: runChangedEvent,
-		
 		/** Save Decisions
 		 * @param {Mixed} values values to save
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		saveValues: function(values, callback, options){
-			var ac = new APIConnection(url, options);
+		saveValues: function(values, callback, options, connOptions){
+			var ac = new APIConnection(url, options, connOptions);
 				ac.post(values, callback);
 		},
 		
@@ -403,38 +401,48 @@ F.API.Run = (function(){
 		 *  @param {Array|String} varnames Variables to get value for
 		 *  @param {Function} callback callback
 		 *  @param {*} params query parameters to include
-		 *  @param {*} options APIConnection options
+		 *  @param {*} connOptions APIConnection options
 		 *  @return callback({Object}) Run object with 'values' as a hash
 		 */
-		getValues: function(varnames, callback, params, options){
+		getValues: function(varnames, callback, params, connOptions){
+			var defaultRunOptions = {
+				exactMatch: true
+			}
+			$.extend(defaultRunOptions, connOptions);
+			
 			var vars = [].concat(varnames);
 			for(var i=0; i< vars.length; i++){
-				vars[i] = encodeURIComponent(F.Template.compile(vars[i]));
-				if(params && params.exactMatch === true){
-					vars[i] = "^" + vars[i] + "$";
+				if(vars[i].match(/\^|\$/) && defaultRunOptions.exactMatch === true){
+					//They threw in exact matches themselves, so let me be nice and turn exact matching off for them.
+					defaultRunOptions.exactMatch = false;
+					if(console && console.warn){
+						console.warn(vars[i], "- This variable name had special characters in it, so exact matching was turned off.")
+					}
 				}
+				vars[i] = encodeURIComponent(F.Template.compile(vars[i]));
 			}
-			var qs= "variables=" + vars.join(",");
+			
+			
+			
+			var varlist = (defaultRunOptions.exactMatch === true) ? "^" + vars.join("$,^") + "$" : vars.join(",");
+			var qs= "variables=" + varlist;
 			
 			var defaultParams = {
 				format: "concise"
 			}
 			$.extend(defaultParams, params);
 			
-			var defaultOptions = {
+			var defaultConnOptions = {
 				parameterParser: null
 			}
-			$.extend(defaultOptions, options);
+			$.extend(defaultConnOptions, connOptions);
 			
-			var ac = new APIConnection(url, defaultParams, defaultOptions );
+			var ac = new APIConnection(url, defaultParams, defaultConnOptions );
 				ac.getJSON(qs, function(response){
 					var run = $.extend(true, {}, response.run);
 					run.values = prettifyValsArray(run.values);
 					
 					(callback || $.noop)(run);
-					if(runChangedEvent){
-						runChangedEvent.fire(run);
-					}
 				});
 		} ,
 		
@@ -488,6 +496,12 @@ F.API.Log = (function(){
 	var url = function(){return F.APIUtils.getURL("log")};
 	
 	var log = function(severity, msg, errorURL,simulateEventType){
+		if(F.isObject(msg)) msg = msg.message;
+		
+		if(errorURL.indexOf("/log/") !== -1){
+			return false;
+			//Don't log errors about the log API. Fair enough.
+		}
 		var params = {
 			level: severity,
 			simulateEventType: simulateEventType,
@@ -528,7 +542,7 @@ F.API.Auth = (function(){
 			var defaults = {
 				parameterParser: null,
 				onError: function(errorMess, errorThrown, responseText){
-					var response = YAHOO.lang.JSON.parse(responseText);
+					var response = $.parseJSON(responseText);
 					callback(response);
 				} //Call the login handler anyway with the status code
 			};
@@ -605,7 +619,7 @@ F.API.Auth = (function(){
 			var defaults = {
 				parameterParser: null,
 				onError: function(errorMess, errorThrown, responseText){
-					var response = YAHOO.lang.JSON.parse(responseText);
+					var response = $.parseJSON(responseText);
 					callback(response);
 				} //Call the login handler anyway with the status code
 			};
