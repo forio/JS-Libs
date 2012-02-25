@@ -452,8 +452,8 @@ F.API.Run = (function(){
 		 * @param {Function} callback 
 		 * @param {*} options
 		 */
-		connect: function(params, callback, options){
-			var ac = new APIConnection(url, options);
+		connect: function(params, callback, apioptions, connoptions){
+			var ac = new APIConnection(url, apioptions, connoptions);
 				ac.post(params, callback);
 		},
 		
@@ -639,7 +639,7 @@ F.API.Auth = (function(){
 F.API.Archive = (function(){
 	var url = function(){return F.APIUtils.getURL("archive")};
 	return{
-		/** Remove a run from Archive. Same as setting the "Saved" property of the run to true through Run API
+		/** Remove a run from Archive. Same as setting the "Saved" property of the run to false through Run API
 		 * @param {String|Array} runId runs to remove
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
@@ -672,8 +672,8 @@ F.API.Archive = (function(){
 		 * @param {Function} callback 
 		 * @param {*} options
 		 */
-		connect: function(params, callback, options){
-			var ac = new APIConnection(url, options);
+		connect: function(params, callback, apioptions, connoptions){
+			var ac = new APIConnection(url, apioptions, connoptions);
 				ac.post(params, callback);
 		},
 		

@@ -48,8 +48,8 @@ var F = function(){
 				pName = prop; 
 			}
 		}
-		else if(F.isString(param) && param.indexOf("=") !== -1){
-			pName = param.split("=")[0];
+		else if(F.isString(param) && param.indexOf(settings.seperator) !== -1){
+			pName = param.split(settings.seperator)[0];
 		}
 		else{
 			pName = param;
@@ -68,7 +68,7 @@ var F = function(){
 		return pName;
 	}
 	
-	function _getParamValue(param){
+	function _getParamValue(param, options){
 		var pVal = "";
 		if(F.isElement(param)){
 			//Do slightly more intelligent parsing for checkboxes and radio-buttons
@@ -113,8 +113,9 @@ var F = function(){
 			}
 		}
 		else if(F.isString(param)){
-			if(param.indexOf("=") === -1) throw new Error("Error parsing decision value: String should be in 'name=value' format");
-			pVal = param.split("=")[1];
+			if(param.indexOf(options.seperator) === -1)
+				throw new Error("Error parsing decision value: String should be in 'name=value' format");
+			pVal = param.split(options.seperator)[1];
 		}
 		else{
 			throw new Error("Unknown Input Format"); 
@@ -141,13 +142,16 @@ var F = function(){
 				paramList = [].concat(paramList);
 			}
 			else if(F.isObject(paramList)){
-				paramList = F.Object.toArray(paramList);
+				paramList = F.Object.toArray(paramList, defaults);
 			}
 			else if(F.isString(paramList)){
-				paramList = paramList.split('&');
+				if(defaults.encode !== false)
+					paramList = paramList.split('&');
+				else
+					paramList = [paramList];
 			}
 			else{
-				throw new TypeError("make: cannot identify input type");
+				throw new Error("make: cannot identify input type");
 			}
 		}
 		else{
@@ -156,8 +160,8 @@ var F = function(){
 		}
 		
 		var makeParam = function(decision){
-			var pName = _quantifyParamName(decision, options);
-			var pVal =  _getParamValue(decision);
+			var pName = _quantifyParamName(decision, defaults);
+			var pVal =  _getParamValue(decision, defaults);
 			
 			var param;
 			if(type === "string") {
@@ -267,10 +271,13 @@ var F = function(){
 			return make(paramList, "string", options);
 	    },
 	    stringify: function(data){
-	    	if(!YAHOO && !YAHOO.lang.JSON && !JSON){
+	    	if(!JSON && YAHOO && YAHOO.lang){
+				JSON = YAHOO.lang.JSON
+			}
+			if(!JSON){
 				throw new TypeError("JSON is undefined. Include json.js");
 			}
-			return YAHOO.lang.JSON.stringify(data);
+			return JSON.stringify(data);
 	    }
 	}
 }()
@@ -550,7 +557,12 @@ F.Array = {
  *  @namespace F
  */
 F.Object = {
-	toArray: function(obj){
+	toArray: function(obj, options){
+		var defaults = {
+			seperator: "="
+		}
+		$.extend(defaults, options)
+		
 		if(!F.isObject(obj)){
 			throw new TypeError("Object.toArray: input is not an Object.");
 		}
@@ -559,11 +571,11 @@ F.Object = {
 	    	if(F.isArray(obj[prop])){
 	    		var paramArray = obj[prop];
 	    		for(var param in paramArray){
-	    			qs.push(prop + "=" + paramArray[param] )
+	    			qs.push(prop + defaults.seperator + paramArray[param] )
 	    		}
 	    	}
 	    	else{
-	            qs.push(prop + "=" + obj[prop]);
+	            qs.push(prop + defaults.seperator + obj[prop]);
 	    	}
 	    }
 	    return qs;
@@ -580,12 +592,7 @@ F.Object = {
 	 * @param {Object| obj input object
 	 * @return{String} string repn of the object;
 	 */
-	serialize: function(obj){
-		if(!YAHOO && !YAHOO.lang.JSON){
-			throw new TypeError("JSON is undefined. Include json.js");
-		}
-		return YAHOO.lang.JSON.stringify(obj);
-	}
+	serialize: F.stringify
 }
 
 
