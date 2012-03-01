@@ -217,7 +217,7 @@ F.API.Data = (function(){
 		}
 		catch(e){
 			if(F.isString(value) || F.isNumber(value)){
-				dataVal = value;
+				dataVal = encodeURIComponent(value);
 			}
 			else{
 				try{

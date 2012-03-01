@@ -116,10 +116,21 @@ F.Decisionize = (function(){
 	}
 	
 	
-	var save = function(elem){
+	var save = function(elem, oldvalue){
 		var key = $(elem).data("model") ? $(elem).data("model") : $(elem).attr("name");
 		if(key.toLowerCase().indexOf("d_") == 0){//Save in Run API
-			F.API.Run.saveValues(elem, populate);
+			F.API.Run.saveValues(elem, populate, null, {onError: function(error, actualError, responseText){
+				responseText = $.parseJSON(responseText);
+				if(responseText.errors){
+					$.each(responseText.errors, function(index, error){
+						var name = error.name.toLowerCase();
+						if(error.decisionMax)  $(elem).attr("max", error.decisionMax);
+						if(error.decisionMin)  $(elem).attr("min", error.decisionMin);
+						
+						$(elem).trigger("change.d", {oldvalue:oldvalue}); //Let the client-side validation kick in
+					})
+				}
+			}});
 		}
 		else{
 			//Save in Data API. TODO: I'm saving but not reading from it right now
@@ -136,21 +147,32 @@ F.Decisionize = (function(){
 		textFocus: function(){
 			$(this).data("valid", $(this).val());
 		},
-		text:  function(){
+		text:  function(evt, data){
 			var $elem = $(this);
 			
 			var min = $elem.attr("min") || $elem.data("min");
 			var max = $elem.attr("max") || $elem.data("max");
 			
 			var val = F.Number.extract($elem.val());
-			if((min && val < min) || (max && val > max)){
-				var prevData = $elem.data("valid");
+			var prevData = (data && data.oldvalue)? data.oldvalue : $elem.data("valid");
+			if((min && val <= min) || (max && val >= max)){
+				var msg, type;
 				$elem.val(prevData);
-				$elem.trigger("validationFailed",  {value: val, message: "Please enter a value between " + min + " and " + max + "."})
+				
+				if(min && val < min){
+					msg = "Please enter a value greater than " + min;
+					type = "min";
+				}
+				else{
+					msg = "Please enter a value less than " + max;
+					type = "max";
+				}
+				
+				$elem.trigger("validationFailed",  {value: val, type: type, text: msg, min: min, max: max})
 			}
 			else{
+				save(this, prevData);
 				$elem.data("valid", $elem.val());
-				save(this);
 			}
 		}
 	}
@@ -268,7 +290,7 @@ F.Decisionize = (function(){
 					.on("change.d", "input[type='range']:dataModel", uiChangeHandler.base)
 					
 					.on("focus.d", ":text:dataModel,input[type='number']:dataModel", uiChangeHandler.textFocus)
-					.on("change", ":text:dataModel, input[type='number']:dataModel", uiChangeHandler.text)
+					.on("change.d", ":text:dataModel, input[type='number']:dataModel", uiChangeHandler.text)
 					
 					.on("modelChange.default", ":radio:dataModel,:checkbox:dataModel", modelChangeHandler.radio)
 					.on("modelChange.default", "textarea:dataModel, :text:dataModel, select:dataModel, input[type='number']:dataModel", modelChangeHandler.text)
