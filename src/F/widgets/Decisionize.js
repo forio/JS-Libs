@@ -127,8 +127,8 @@ F.Decisionize = (function(){
 						var type = error.type.toUpperCase();
 						
 						if(type === "ABOVE_MAX" || type === "BELOW_MIN"){
-							if(error.decisionMax)  $(elem).attr("max", error.decisionMax);
-							if(error.decisionMin)  $(elem).attr("min", error.decisionMin);
+							if(error.decisionMax || error.decisionMax === 0)  $(elem).attr("max", error.decisionMax);
+							if(error.decisionMin || error.decisionMin === 0)  $(elem).attr("min", error.decisionMin);
 						
 							$(elem).trigger("change.d", {oldvalue:oldvalue}); //Let the client-side validation kick in
 						}
