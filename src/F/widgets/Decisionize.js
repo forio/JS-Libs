@@ -124,10 +124,14 @@ F.Decisionize = (function(){
 				if(responseText.errors){
 					$.each(responseText.errors, function(index, error){
 						var name = error.name.toLowerCase();
-						if(error.decisionMax)  $(elem).attr("max", error.decisionMax);
-						if(error.decisionMin)  $(elem).attr("min", error.decisionMin);
+						var type = error.type.toUpperCase();
 						
-						$(elem).trigger("change.d", {oldvalue:oldvalue}); //Let the client-side validation kick in
+						if(type === "ABOVE_MAX" || type === "BELOW_MIN"){
+							if(error.decisionMax)  $(elem).attr("max", error.decisionMax);
+							if(error.decisionMin)  $(elem).attr("min", error.decisionMin);
+						
+							$(elem).trigger("change.d", {oldvalue:oldvalue}); //Let the client-side validation kick in
+						}
 					})
 				}
 			}});
