@@ -57,8 +57,8 @@ F.Decisionize = (function(){
 					var isUpdate = 
 						(action.indexOf("update") !== -1 || action.indexOf("noop") === -1);
 					
-					var isShow =
-						(action.indexOf("show") !== -1);
+					var isToggle =
+						(action.indexOf("show") !== -1) || (action.indexOf("hide") !== -1);
 						
 					var isChange = false;
 					if(isUpdate){
@@ -90,7 +90,7 @@ F.Decisionize = (function(){
 								isChange = (elemVal !== formattedVal);
 						}
 					}
-					if(isShow){
+					if(isToggle){
 						var elemName = $(elem).data("model").split("=")[0].toLowerCase();
 						var elemVal = $(elem).data("model").split("=")[1];
 						
@@ -99,6 +99,7 @@ F.Decisionize = (function(){
 						
 						isChange = (isMatch && isHidden) || (!isMatch && !isHidden);
 						
+						if(action.indexOf("hide") !== -1) isChange = !isChange;
 						//console.log("change", elem, val, action, isMatch, isHidden, isChange)
 					}
 					
@@ -215,42 +216,50 @@ F.Decisionize = (function(){
 				var CHANGE_CLASS = "changed";
 				var HIDDEN_CLASS = "hidden";
 				
-				var defaultActionList = {
-					update: function(params){
-						switch(type){
-							case "radio":
-							case "checkbox":
-								elem.checked = !elem.checked;
-								break;
-							case "text":
-								$(elem).val(getFormattedVal(params.value));
-								break;
-							default:
-								$(elem).text(getFormattedVal(params.value));
-						}
-						if(params.animate){
-							$(elem).addClass(CHANGE_CLASS);
-							setTimeout(function(){$(elem).removeClass(CHANGE_CLASS)}, 1500) 
-						}
-					},
-					show: function(params){
+				var defaultActionList = function(){
+					var toggle = function(isShow, elem, params){
 						var elemmodelName = $(elem).data("model").split("=")[0].toLowerCase();
 						var modelName = params.value.label.toLowerCase();
 						
 						if(modelName === elemmodelName){
-							if(matchVals(elem, params.value)){
-							$(elem).removeClass(HIDDEN_CLASS);
-							//console.log("removing", HIDDEN_CLASS, "from", elem, params)
+							if((isShow && matchVals(elem, params.value)) || (!isShow && !matchVals(elem, params.value))){
+								$(elem).removeClass(HIDDEN_CLASS);
+								//console.log("removing", HIDDEN_CLASS, "from", elem, params)
+							}
+							else{
+								//console.log("adding", HIDDEN_CLASS, "to", elem, params)
+								$(elem).addClass(HIDDEN_CLASS);
+							}
 						}
-						else{
-							//console.log("adding", HIDDEN_CLASS, "to", elem, params)
-							$(elem).addClass(HIDDEN_CLASS);
-						}
-						}
-						
-					},
-					noop: $.noop
-				}
+					}
+					return{
+						update: function(params){
+							switch(type){
+								case "radio":
+								case "checkbox":
+									elem.checked = !elem.checked;
+									break;
+								case "text":
+									$(elem).val(getFormattedVal(params.value));
+									break;
+								default:
+									$(elem).text(getFormattedVal(params.value));
+							}
+							if(params.animate){
+								$(elem).addClass(CHANGE_CLASS);
+								setTimeout(function(){$(elem).removeClass(CHANGE_CLASS)}, 1500) 
+							}
+						},
+						show: function(params){
+							return toggle(true, elem, params);
+						},
+						hide:  function(params){
+							return toggle(false, elem, params);
+						},
+						noop: $.noop
+					}
+				}()
+				
 				$.each(actions, function(index, action){
 					action = $.trim(action);
 					if(action){
