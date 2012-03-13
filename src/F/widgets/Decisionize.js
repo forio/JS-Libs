@@ -296,6 +296,7 @@ F.Decisionize = (function(){
 				selector+= " ";
 				
 				$(selector)
+					.off("click.d, blur.d,change.d,focus.d,modelChange.default", "*")
 					.on("click.d", ":radio:dataModel", uiChangeHandler.base)
 					.on("blur.d", "textarea:dataModel", uiChangeHandler.base)
 					.on("change.d", ":checkbox:dataModel", uiChangeHandler.base)

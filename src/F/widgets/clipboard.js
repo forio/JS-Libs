@@ -73,14 +73,16 @@ var ClipBoard = {
 			if(!!textElems.length){
 				val = $.trim($(cell).find(':text').val());
 			}
-			else if(!!$(cell).find('img').get().length){
-				val = $.trim($(cell).find('img:first').attr('alt'));
-			}
 			else if($(cell).children().size()){
-				val = $.trim($(cell).find(":visible").text());
+				if(!!$(cell).find('img').get().length){
+					var $imgElem = $(cell).find('img:first:not(.nocopy)');
+					val = ($imgElem.attr("title")) ? $imgElem.attr("title") : $imgElem.attr("alt");
+					val = $.trim(val);
+				}
+				val += " " +$.trim($(cell).find(":not(.nocopy)").text());
+				
 				if(!val)
 					val = $.trim($(cell).text());
-					
 			}	
 			else{
 				val = $.trim($(cell).text());

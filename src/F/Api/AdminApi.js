@@ -146,7 +146,7 @@ F.API.User = (function(){
 		 */
 		create: function(email, pass, firstName, lastName, params, callback, options){
 			var defaults = {
-				email: email,
+				email: encodeURIComponent(email),
 				password: pass,
 				firstName: firstName,
 				lastName: lastName,

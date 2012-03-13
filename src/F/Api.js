@@ -217,19 +217,19 @@ F.API.Data = (function(){
 		}
 		catch(e){
 			if(F.isString(value) || F.isNumber(value)){
-				dataVal = encodeURIComponent(value);
+				dataVal = value;
 			}
 			else{
 				try{
 					dataVal = F.stringify(value);
 				}
 				catch(e){
-					throw new Error("Data API: unknown value format");
+					throw new Error(e, 227, "Data API: Api.js; unknown format");
 				}
 			}
 		}
 		
-		return dataVal;
+		return encodeURIComponent(dataVal);
 	}
 	
 	var url = function(key){return F.APIUtils.getURL("data") + "/" + key};
