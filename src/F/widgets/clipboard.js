@@ -27,7 +27,8 @@ var ClipBoard = {
         onInit: "ClipBoard.onInit",
         text: "Copy to Clipboard",
         datasource: "ClipBoard.copyTable('.dataTable')",
-        icon: "../student/img/copy-to-clipboard.png",
+        icon: "img/page_white_paste.png",
+        swfPath: "swf/ClipBoard.swf",
         onSuccess: "ClipBoard.copySuccess",
         onFailure: "ClipBoard.copyFailure"
     },
@@ -60,7 +61,7 @@ var ClipBoard = {
         this.id = domId;
         $.extend(this._defaultDimensions, dimensions);
         var flashVars = $.extend({}, this._defaultSettings,settings );
-        swfobject.embedSWF("swf/ClipBoard.swf", domId, this._defaultDimensions.width, this._defaultDimensions.height,
+        swfobject.embedSWF(this_defaultSettings.swfPath, domId, this._defaultDimensions.width, this._defaultDimensions.height,
                         '9.0.0','swf/expressInstall.swf', flashVars, this. _params);
     },
     copyTable: function(tableSelector){
