@@ -27,8 +27,8 @@ var ClipBoard = {
         onInit: "ClipBoard.onInit",
         text: "Copy to Clipboard",
         datasource: "ClipBoard.copyTable('.dataTable')",
-        icon: "img/page_white_paste.png",
-        swfPath: "swf/ClipBoard.swf",
+        icon: "/tools/libs/resources/img/page_white_paste.png",
+        swfPath: "/tools/libs/resources/swf/ClipBoard.swf",
         onSuccess: "ClipBoard.copySuccess",
         onFailure: "ClipBoard.copyFailure"
     },
@@ -61,7 +61,7 @@ var ClipBoard = {
         this.id = domId;
         $.extend(this._defaultDimensions, dimensions);
         var flashVars = $.extend({}, this._defaultSettings,settings );
-        swfobject.embedSWF(this_defaultSettings.swfPath, domId, this._defaultDimensions.width, this._defaultDimensions.height,
+        swfobject.embedSWF(this._defaultSettings.swfPath, domId, this._defaultDimensions.width, this._defaultDimensions.height,
                         '9.0.0','swf/expressInstall.swf', flashVars, this. _params);
     },
     copyTable: function(tableSelector){
@@ -75,8 +75,8 @@ var ClipBoard = {
 				val = $.trim($(cell).find(':text').val());
 			}
 			else if($(cell).children().size()){
-				if(!!$(cell).find('img').get().length){
-					var $imgElem = $(cell).find('img:first:not(.nocopy)');
+				if(!!$(cell).find('.img, img').get().length){
+					var $imgElem = $(cell).find('img:first:not(.nocopy),.img:first:not(.nocopy)');
 					val = ($imgElem.attr("title")) ? $imgElem.attr("title") : $imgElem.attr("alt");
 					val = $.trim(val);
 				}
