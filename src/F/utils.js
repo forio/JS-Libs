@@ -187,10 +187,13 @@ var F = function(){
 					if(countOfItems > 1) return false
 				}
 			}
-			if(!F.isString(data)){
-				return false;
+			else if(F.isString(data)){
+				return data.split("&").length == 1;
 			}
-			return true;
+			else{
+				return true;
+			}
+			
 		}
 		
 		var qs;
