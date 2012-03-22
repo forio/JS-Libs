@@ -107,6 +107,10 @@ var ClipBoard = {
 		
 		var rowspanData = [];
 		var newrowspanData = [];
+		
+		if( $(tableSelector + " caption").size())
+			tableData.push( $.trim( $(tableSelector + " caption").html() ) )
+			
 		$(tableSelector + " tr").each(function(index, row){
 			var rowspan =  parseInt($(this).children('[rowspan]').attr("rowspan"));
 			if(rowspan && rowspan > 1){
@@ -155,6 +159,7 @@ var ClipBoard = {
 				tableData.push(thisRow.join("\t"));
 			}
 		});
+		
 		return tableData.join("\n");
 	},
     /*

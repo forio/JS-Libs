@@ -238,14 +238,14 @@ F.API.Data = (function(){
 		/** Save values to the data API. Assume object is single tuple as in "a=b" or "{a:b}" which posts 'b' to <URL>/a
 		 * @param {Mixed} params stuff to save
 		 */
-		save: function(params, callback, options){
+		save: function(params, callback, options, apioptions){
 			params = F.makeObject(params);
 			var dataKey, dataVal;
 			for(var prop in params){ //Assume object just has the one key
 				dataKey = prop;
 				dataVal = params[prop];
 			}
-			this.saveAs(dataKey, dataVal, callback, options);
+			this.saveAs(dataKey, dataVal, callback, options, apioptions);
 		},
 		
 		//TODO: simulate auto unescapes stuff before passing it on- replace " with /"
@@ -256,26 +256,29 @@ F.API.Data = (function(){
 		 * @param {*} options (optional)
 		 * 
 		 */
-		saveAs: function(key, value, callback, options){
+		saveAs: function(key, value, callback, options, apioptions){
 			if(!isKeyValid(key)){
 				throw new Error("Data.save: Invalid key " + key );
 			}
 			
+			var actualOptions = $.extend(true, {parameterParser: null}, apioptions)
 			var dataVal = getDataVal(value);
 			//UGH: simulate gotcha no.12312: What? You want case insensitive url params? surely you jest
 			var val =  "data_action=SETPROPERTY&value=" + dataVal;
-			var ac = new APIConnection(url(key), options, {parameterParser: null});
+			var ac = new APIConnection(url(key), options, actualOptions);
 				ac.post(val, callback);
 		},
 		
 		/** Pushes a value to the end of an arrar **/
-		push: function(key, value, callback, options){
+		push: function(key, value, callback, options, apioptions){
 			if(!isKeyValid(key)){
 				throw new Error("Data.save: Invalid key " + key );
 			}
 			var dataVal = getDataVal(value);
 			var val =  "data_action=PUSH&value=" + dataVal;
-			var ac = new APIConnection(url(key), options, {parameterParser: null});
+			
+			var actualOptions = $.extend(true, {parameterParser: null}, apioptions)
+			var ac = new APIConnection(url(key), options, actualOptions);
 				ac.post(val, callback);
 		},
 		
@@ -284,8 +287,8 @@ F.API.Data = (function(){
 		 * @param {Function} callback - Gets called with data object
 		 * @param {*} options
 		 */
-		load: function(key, callback, options){
-			var ac = new APIConnection(url(key), options);
+		load: function(key, callback, options, apioptions){
+			var ac = new APIConnection(url(key), options, apioptions);
 				ac.getJSON("", function(response){
 					var data = (response.data) ? response.data : ( (response.users) ? response.users : response ) ;
 					(callback || $.noop)(data);
@@ -297,8 +300,8 @@ F.API.Data = (function(){
 		 * @param {Function} callback 
 		 * @param {*} options
 		 */
-		remove: function(key, callback, options){
-			var ac = new APIConnection(url(key), options);
+		remove: function(key, callback, options, apioptions){
+			var ac = new APIConnection(url(key), options, apioptions);
 				ac.post("method=Delete", function(response){
 					var data = response.data;
 					(callback || $.noop)(data);
@@ -311,8 +314,8 @@ F.API.Data = (function(){
 		 * @param {Function} callback 
 		 * @param {*} options
 		 */
-		connect: function(key, params, callback, options){
-			var ac = new APIConnection(url(key), options);
+		connect: function(key, params, callback, options, apioptions){
+			var ac = new APIConnection(url(key), options, apioptions);
 				ac.post(params, function(response){
 					(callback || $.noop)(response);
 				});
@@ -363,12 +366,12 @@ F.API.Run = (function(){
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		setProperties:function(properties, callback, options){
+		setProperties:function(properties, callback, options, apioptions){
 			properties = F.makeQueryString(properties, {seperator: ":", encode: false});
 			var propQs= {
 				"run_set" : properties.split("&")
 			}
-			var ac = new APIConnection(url, options);
+			var ac = new APIConnection(url, options, apioptions);
 				ac.post(propQs, callback);
 		},
 		
@@ -377,13 +380,13 @@ F.API.Run = (function(){
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		doActions: function(actions, runid, callback, options){
+		doActions: function(actions, runid, callback, options, apioptions){
 			var actionsQs= {
 				"run_action" : [].concat(actions),
 				"run": runid
 			}
 			
-			var ac = new APIConnection(url, options);
+			var ac = new APIConnection(url, options, apioptions);
 				ac.post(actionsQs, callback);
 		},
 		
@@ -392,8 +395,8 @@ F.API.Run = (function(){
 		 * @param {Object} options (optional)
 		 * @return callback({Object}) the run object
 		 */
-		getInfo:function(callback, options){
-			var ac = new APIConnection(url, options );
+		getInfo:function(callback, options, apioptions){
+			var ac = new APIConnection(url, options, apioptions );
 				ac.getJSON("", callback);
 		},
 		
@@ -421,8 +424,6 @@ F.API.Run = (function(){
 				}
 				vars[i] = encodeURIComponent(F.Template.compile(vars[i]));
 			}
-			
-			
 			
 			var varlist = (defaultRunOptions.exactMatch === true) ? "^" + vars.join("$,^") + "$" : vars.join(",");
 			var qs= "variables=" + varlist;
@@ -463,19 +464,19 @@ F.API.Run = (function(){
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		clone: function(runId, callback, options){
+		clone: function(runId, callback, options, apioptions){
 			if(!runId){
 				throw new Error("Run.clone: No source run provided");
 			}
-			this.doActions("clone", runId, callback, options);
+			this.doActions("clone", runId, callback, options, apioptions);
 		},
 		
 		/** Reset run to initial
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		reset: function(callback, options){
-			this.doActions("reset", "", callback, options);
+		reset: function(callback, options, apioptions){
+			this.doActions("reset", "", callback, options, apioptions);
 		},
 		
 		/** Advance Run. Just do doActions("step") if you just want to step once. Same as "doActions('step_to_x')"
@@ -483,11 +484,11 @@ F.API.Run = (function(){
 		 * @param {Function} callback (optional)
 		 * @param {Object} options (optional)
 		 */
-		stepTo: function(step, callback, options){
+		stepTo: function(step, callback, options, apioptions){
 			if(!step){
 				throw new Error("Run.stepTo: No step provided");
 			}
-			this.doActions("step_to_"+ step, "", callback, options);
+			this.doActions("step_to_"+ step, "", callback, options, apioptions);
 		}
 	}
 }());
@@ -552,13 +553,33 @@ F.API.Auth = (function(){
 				ac.post(params , callback);
 		},
 		
-		createAnonAccount: function(firstName, lastName, callback){
+		impersonate: function(user, group, callback, options){
+			var params = "user_action=impersonate&username=" + encodeURIComponent(user);
+			if(group) params += "group="+ group;
+			
+			var defaults = {
+				parameterParser: null
+			};
+			$.extend(defaults, options);
+			
+			var ac = new APIConnection(url, defaults.params, defaults);
+				ac.post(params , callback);
+		},
+		unimpersonate: function(callback, options){
+			var params = "user_action=unimpersonate";
+			var defaults = {parameterParser: null};
+			$.extend(defaults, options);
+			var ac = new APIConnection(url, defaults.params, defaults);
+				ac.post(params , callback);
+		},
+		
+		createAnonAccount: function(firstName, lastName, callback, apioptions){
 			var params = {
 				user_action: "anonymous_login",
 				firstName:firstName, 
 				lastName: lastName
 			}
-			var ac = new APIConnection(url, "");
+			var ac = new APIConnection(url, "", apioptions);
 				ac.post(params , callback);
 		},
 		/** Logout from the simulation
@@ -589,7 +610,7 @@ F.API.Auth = (function(){
 		 * @param {Object} options (optional)
 		 * @return callback({Boolean})
 		 */
-		isUserLoggedIn: function(callback, options){
+		isUserLoggedIn: function(callback, options, apioptions){
 			var ac = new APIConnection(url);
 				ac.getJSON("", function(response){
 					(callback || $.noop)(response && response.canRunSim);				
@@ -601,7 +622,7 @@ F.API.Auth = (function(){
 		 * @param {Object} options (optional)
 		 * @return callback({Object}) Object representing user info
 		 */
-		getUserInfo: function(callback, options){
+		getUserInfo: function(callback, options, apioptions){
 			var ac = new APIConnection(url);
 				ac.getJSON("",callback);
 		},
@@ -645,13 +666,13 @@ F.API.Archive = (function(){
 		 * @param {Object} options (optional)
 		 * @return {}
 		 */
-		remove:function(runId, callback, options){
+		remove:function(runId, callback, options, apioptions){
 			var params =  {
 				method: "DELETE",
 				run: [].concat(runId)
 			}
 			
-			var ac = new APIConnection(url, options);
+			var ac = new APIConnection(url, options, apioptions);
 				ac.post(params , callback);
 		},
 		
@@ -661,8 +682,8 @@ F.API.Archive = (function(){
 		 * @param {Object} options (optional)
 		 * @return {} 
 		 */
-		getRuns:function(filter , callback, options){
-			var ac = new APIConnection(url, options);
+		getRuns:function(filter , callback, options, apioptions){
+			var ac = new APIConnection(url, options, apioptions);
 				ac.getJSON(filter , callback);
 		},
 		
@@ -677,8 +698,8 @@ F.API.Archive = (function(){
 				ac.post(params, callback);
 		},
 		
-		setProperties: function(runId, properties, callback, options){
-			var ac = new APIConnection(url, options);
+		setProperties: function(runId, properties, callback, options, apioptions){
+			var ac = new APIConnection(url, options, apioptions);
 			properties = F.makeQueryString(properties, {seperator: ":"});
 			var propQs= {
 				"run_set" : properties.split("&"),

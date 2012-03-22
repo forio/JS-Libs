@@ -179,8 +179,22 @@ var F = function(){
 			return val;
 		}
 		
+		var isRecursionEnd = function(data){
+			if(F.isObject(data)){
+				var countOfItems = 0;
+				for (var name in data) {
+					if(data.hasOwnProperty(name)) countOfItems++
+					if(countOfItems > 1) return false
+				}
+			}
+			if(!F.isString(data)){
+				return false;
+			}
+			return true;
+		}
+		
 		var qs;
-		if(paramList.length === 1){
+		if(paramList.length === 1 && isRecursionEnd(paramList[0])){
 			qs = makeParam(paramList[0]);
 		}
 		else{
