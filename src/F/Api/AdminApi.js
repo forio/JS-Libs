@@ -69,8 +69,12 @@ F.API.UserGroup = (function(){
 			var ac = new APIConnection(newurl, "", defaultOptions);
 				ac.post(defaultParams , callback);
 		},
-		
-		
+		getInfo: function(grpName, callback, options, apioptions){
+			grpName || (grpName = "")
+			
+			var ac = new APIConnection(url + "/" + grpName, options, apioptions);
+				ac.getJSON("" , callback);
+		},
 		setUserParams: function(grpName, targetUser, params, callback, options){
 			//params.team and params.role
 			//no action
