@@ -9,6 +9,7 @@ F.API.Auth.getUserInfo(function(data){
 		}
 		var startImpersonating = function(){
 			var firstUser = userList.pop();
+			console.log("Initializing " + firstUser + ". " + userList.length + " users remaining.");
 			if(firstUser){
 				
 				F.API.Auth.impersonate(firstUser, "", function(){
@@ -18,15 +19,19 @@ F.API.Auth.getUserInfo(function(data){
 							runs.push(data.run[i].runId)
 						}
 						
+						console.log("found",runs.length, "runs" );
 						var start = function(){
 							var firstRun = runs.pop();
+							console.log("Initializing " + firstRun + ". " + runs.length + " runs remaining.");
 							if(firstRun){
 									F.API.Run.doActions("resume", firstRun, function(){
-										F.API.Run.doActions("replay", firstRun, start);
+										F.API.Run.doActions("replay", firstRun, function(){
+											F.API.Run.setProperties({saved:true}, start)
+										});
 									})
 							}
 							else{
-								console.log("All runs complete");
+								console.log("All runs complete for", firstUser);
 								F.API.Auth.unimpersonate(startImpersonating)
 							}
 						}

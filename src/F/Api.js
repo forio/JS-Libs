@@ -303,8 +303,7 @@ F.API.Data = (function(){
 		remove: function(key, callback, options, apioptions){
 			var ac = new APIConnection(url(key), options, apioptions);
 				ac.post("method=Delete", function(response){
-					var data = response.data;
-					(callback || $.noop)(data);
+					(callback || $.noop)(response);
 				});
 		},
 		
@@ -382,10 +381,10 @@ F.API.Run = (function(){
 		 */
 		doActions: function(actions, runid, callback, options, apioptions){
 			var actionsQs= {
-				"run_action" : [].concat(actions),
-				"run": runid
+				"run_action" : [].concat(actions)
 			}
-			
+			if(runid)
+				$.extend(actionsQs, {run:runid});
 			var ac = new APIConnection(url, options, apioptions);
 				ac.post(actionsQs, callback);
 		},

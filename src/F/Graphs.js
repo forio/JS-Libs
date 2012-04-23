@@ -63,26 +63,40 @@ F.GraphUtils = function(){
 					var itemName = $.trim(F.Template.compile(item).toLowerCase());
 					//TODO: make ', ' same as ',' to allow errors in specifying name
 					
-					if(itemName.indexOf(".result") !== -1){
-						var newItemName = itemName.substr(0,itemName.indexOf(".result"));
-						var results = runValues[newItemName].results;
+					var pattern = /(.*).(Result|Decision)\((.*)\)/i;
+					var match = pattern.exec(itemName);
+					if(match){
+						var actualVarName = match[1];
+						var isResult = (match[2] === "result");
+						var range = match[3]; // ... or 1..3
+						
+						var results = runValues[actualVarName].results; //TODO: Also split for .decision
+						
+						if(range){
+							var first = range.indexOf(0);
+							var last = range.indexOf(range.length);
+							
+							var startIndex = (first === ".") ? 0 : parseInt(first);
+							var endIndex = (last === ".") ? range.length : last;
+							
+							results = results.slice(startIndex, endIndex);
+						}
 						
 						var kindex = 0;
 						for(var k=0; k< results.length; k++){
-							if(k%2 == 0){
-								//TODO: skipping a step for now
-								kindex++;
-								index = j+kindex;
-								//dataArray.push(parseFloat(results[k].result));
-								dataArray.push(F.Number.extract(results[k].resultFormatted));
-								dataFormattedArray.push(results[k].resultFormatted);
-							}
+							kindex++;
+							index = j+kindex;
+							//dataArray.push(parseFloat(results[k].result));
+							dataArray.push(F.Number.extract(results[k].resultFormatted));
+							dataFormattedArray.push(results[k].resultFormatted);
 						}
 					}
 					else{
+						//Just a regular variable name
 						dataArray[index] =  parseFloat(runValues[itemName].result);
 						dataFormattedArray[index] = runValues[itemName].resultFormatted;
 					}
+		
 				}
 				else if(F.isObject(item) && item.y){
 					//Data was specified in "y" format
