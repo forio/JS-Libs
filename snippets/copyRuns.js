@@ -21,7 +21,7 @@ F.API.Archive.getRuns("saved=true&step=10&variables=$Fired^&facilitator=false&gr
 			var params = [
 				"run_action=copy",
 				"method=post",
-				"group_name=harvardtest",
+				"group_name=" + GROUP_TO_COPY_FROM,
 				"run="+ firstRun,
 				"toUserEmail="+ user,
 				"toGroupName=" + GROUP_TO_COPY_TO,
