@@ -38,7 +38,7 @@ var ClipBoard = {
     
     _alert: function(text){
         try{
-             Dialogs.showAlert(text) 
+             Dialogs.showAlert(text, $.noop, {zIndex: 101}) 
         }
         catch(e){
             alert(text);
@@ -68,6 +68,9 @@ var ClipBoard = {
 		tableSelector || (tableSelector = 'table.dataTable');
 		var tableData = [];
 		var getCellContents = function(cell){
+			if($(cell).hasClass("nocopy")) return "";
+			if($(cell).hasClass("skipcopy")) return false;
+			
 			var textElems = $(cell).find(':text').get();
 			var val = "";
 			
@@ -118,7 +121,9 @@ var ClipBoard = {
 				for(var i=0; i< rowspan; i++){
 					var thisRow = [];
 					$(this).children('td, th').each(function(index, cell){
-						thisRow.push(getCellContents(this));
+						var contents = getCellContents(this);
+						if(contents !== false)
+							thisRow.push(contents);
 					});
 					rowspanData.push(thisRow);
 					tableData.push(thisRow.join("\t"));
@@ -151,9 +156,13 @@ var ClipBoard = {
 				var thisRow = [];
 				$(this).children('td, th').each(function(index, cell){
 					var contents = getCellContents(this);
-					if (rowSpanForthisCell && rowSpanForthisCell[index]) 
-						contents = rowSpanForthisCell[index]  + contents
-					thisRow.push(contents);
+					if(contents !== false){
+						if (rowSpanForthisCell && rowSpanForthisCell[index]) {
+							contents = rowSpanForthisCell[index]  + contents;
+						}
+						thisRow.push(contents);
+					}
+					
 				});
 				
 				tableData.push(thisRow.join("\t"));

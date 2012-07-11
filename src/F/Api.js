@@ -350,6 +350,7 @@ F.API.Run = (function(){
 	}
 	
 	return {
+		prettifyValsArray: prettifyValsArray,
 		/** Save Decisions
 		 * @param {Mixed} values values to save
 		 * @param {Function} callback (optional)
@@ -427,6 +428,9 @@ F.API.Run = (function(){
 			var varlist = (defaultRunOptions.exactMatch === true) ? "^" + vars.join("$,^") + "$" : vars.join(",");
 			var qs= "variables=" + varlist;
 			
+			//IE doesn't like gets greater than 2083 characters
+			var SHOULD_I_FAKE_POST = qs.length >= 1090;
+			
 			var defaultParams = {
 				format: "concise"
 			}
@@ -437,13 +441,23 @@ F.API.Run = (function(){
 			}
 			$.extend(defaultConnOptions, connOptions);
 			
+			var action;
 			var ac = new APIConnection(url, defaultParams, defaultConnOptions );
-				ac.getJSON(qs, function(response){
-					var run = $.extend(true, {}, response.run);
-					run.values = prettifyValsArray(run.values);
-					
-					(callback || $.noop)(run);
-				});
+			if(SHOULD_I_FAKE_POST){
+				action = ac.post;
+				qs += "&method=GET";
+			}
+			else{
+				action = ac.get;
+			}
+			
+			action(qs, function(response){
+				
+				var run = $.extend(true, {}, response.run);
+				run.values = prettifyValsArray(run.values);
+				
+				(callback || $.noop)(run, response);
+			});
 		} ,
 		
 		/** Generic connection handler, does no params by default
@@ -553,8 +567,8 @@ F.API.Auth = (function(){
 		},
 		
 		impersonate: function(user, group, callback, options){
-			var params = "user_action=impersonate&username=" + encodeURIComponent(user);
-			if(group) params += "group="+ group;
+			var params = "user_action=impersonate&user=" + encodeURIComponent(user);
+			if(group) params += "&group="+ group;
 			
 			var defaults = {
 				parameterParser: null
@@ -682,8 +696,18 @@ F.API.Archive = (function(){
 		 * @return {} 
 		 */
 		getRuns:function(filter , callback, options, apioptions){
+			var cb = (callback || $.noop);
 			var ac = new APIConnection(url, options, apioptions);
-				ac.getJSON(filter , callback);
+				ac.getJSON(filter , function(data){
+					var runsList = []
+					$.each(data.run, function(index,run){
+							var thisRun = $.extend(true, {}, run);
+							thisRun.values = F.API.Run.prettifyValsArray(run.values);
+							
+							runsList.push(thisRun);
+					})
+					cb(runsList, data);
+				});
 		},
 		
 		/** Generic connection handler, does no params by default

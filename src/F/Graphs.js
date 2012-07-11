@@ -24,7 +24,9 @@ F.GraphUtils = function(){
 		return variableList;
 	}
 	
-	var getDataForSeries = function(variableList, callback){
+	var getDataForSeries = function(variableList, callback, options){
+		var useArchive= (options && options.archiveParams);
+
 		if(!variableList || variableList.length === 0){
 			callback([]);
 		}
@@ -38,17 +40,31 @@ F.GraphUtils = function(){
 					variableList[i]= variableList[i].substr(0,variableList[i].indexOf(".result"));
 				}
 			}
-			F.API.Run.getValues(variableList, function(run){
-				var runValues = run.values;
-				callback(runValues) ;
-			}, {format: "runtime"});
+			
+			if(useArchive){
+				F.API.Archive.getRuns(options.archiveParams, function(runs){
+					if(runs.length){
+						var runValues = runs[0].values;
+						callback(runValues) ;
+					}
+				})
+			}
+			else{
+				F.API.Run.getValues(variableList, function(run){
+					var runValues = run.values;
+					callback(runValues) ;
+				}, {format: "runtime"});
+			}
+			
 		}
 	}
 	
-	var unifySeriesData = function(runValues, ipSeries, callback){
+	var unifySeriesData = function(runValues, ipSeries, callback, options){
 		var series = F.Array.copy(ipSeries);
-
-		//console.log("unifySeriesData", runValues, ipSeries)
+		var useResultFormatted = (options && options.plotResultFormatted);
+		
+		var numberFormat = "";
+		//console.log("unifySeriesData", runValues, ipSeries, options, useResultFormatted)
 		for(var i=0; i<series.length; i++){
 			var thisseries = series[i];
 				thisseries.dataFormatted = [];
@@ -71,13 +87,15 @@ F.GraphUtils = function(){
 						var range = match[3]; // ... or 1..3
 						
 						var results = runValues[actualVarName].results; //TODO: Also split for .decision
+						numberFormat =runValues[actualVarName].numberFormat;
 						
 						if(range){
-							var first = range.indexOf(0);
-							var last = range.indexOf(range.length);
+							var first = range.charAt(0);
+							var max = range.length -1;
+							var last = range.charAt(max);
 							
 							var startIndex = (first === ".") ? 0 : parseInt(first);
-							var endIndex = (last === ".") ? range.length : last;
+							var endIndex = (last === ".") ? results.length : last;
 							
 							results = results.slice(startIndex, endIndex);
 						}
@@ -87,13 +105,19 @@ F.GraphUtils = function(){
 							kindex++;
 							index = j+kindex;
 							//dataArray.push(parseFloat(results[k].result));
-							dataArray.push(F.Number.extract(results[k].resultFormatted));
+							var val = (!useResultFormatted) ? parseFloat(results[k].result) : F.Number.extract(results[k].resultFormatted);
+							
+							
+							dataArray.push(val);
 							dataFormattedArray.push(results[k].resultFormatted);
 						}
 					}
 					else{
 						//Just a regular variable name
-						dataArray[index] =  parseFloat(runValues[itemName].result);
+						
+						var val = (!useResultFormatted) ? parseFloat(runValues[itemName].result) : F.Number.extract(runValues[itemName].resultFormatted);
+						dataArray[index] =  val;
+						numberFormat = runValues[itemName].numberFormat;
 						dataFormattedArray[index] = runValues[itemName].resultFormatted;
 					}
 		
@@ -105,16 +129,18 @@ F.GraphUtils = function(){
 					
 					var itemName = $.trim(F.Template.compile(itemClone.y).toLowerCase());
 					//var value = (runValues[itemName].result);
-					var value = (F.Number.extract[itemName].resultFormatted);
+					var value = (F.Number.extract(runValues[itemName].resultFormatted));
 					var valueFormatted =runValues[itemName].resultFormatted;
 						
+					numberFormat = runValues[itemName].numberFormat;
+					
 					itemClone.y = value;
 					itemFormattedClone.y = valueFormatted;
 					
 					dataArray[index] = itemClone;
 					dataFormattedArray[index] = itemFormattedClone;
 				}
-				else if(parseFloat(item)){
+				else if(!isNaN(parseFloat(item))){
 					dataArray.push(item)
 				}
 				else{
@@ -125,20 +151,21 @@ F.GraphUtils = function(){
 			//console.log("fina", dataArray, dataFormattedArray)
 			thisseries.data = dataArray;
 			thisseries.dataFormatted = dataFormattedArray;
+			thisseries.numberFormat = numberFormat;
 			
 			series[i] = thisseries;
 		}
-		//console.log(ipSeries, series, "unify")
-		return series;
+		//console.log(ipSeries, series, numberFormat, "unify")
+		return {series: series, numberFormat: numberFormat};
 	}
 	
 	return{
-		populateSeries: function(series, callback){
+		populateSeries: function(series, callback, options){
 			var variableList = getSeriesVariables(series);
 			getDataForSeries(variableList, function(runValues){
-				var populatedSeries = unifySeriesData(runValues, series);
-				callback(populatedSeries);
-			});
+				var populatedSeries = unifySeriesData(runValues, series, $.noop, options);
+				callback(populatedSeries.series, populatedSeries.numberFormat);
+			}, options);
 		}
 	};
 }();
@@ -147,6 +174,9 @@ var FChart = function(options){
 	var hc, model, isDataURL;
 
 	var defaultOptions = {
+		FOptions: {
+			numberFormat: "auto"
+		},
 		title: {
 			 style:{
 				fontFamily: 'verdana',
@@ -186,22 +216,42 @@ var FChart = function(options){
 			var ac = new AjaxConnection(defaultOptions.seriesURL);
 				ac.getJSON("", function(res){
 					var res = $.parseJSON(F.String.clean(res))
-					callback(res)
+					callback(res);
 				})
 		}
 		else{
-			F.GraphUtils.populateSeries(model, callback);
+			F.GraphUtils.populateSeries(model, callback,defaultOptions.FOptions);
 		}
 	}
 	
-	draw(function(series){
+	draw(function(series, numberFormat){
 		defaultOptions.series = series;
+		
+		var format = defaultOptions.FOptions.numberFormat;
+		if(format !== "auto"){
+			var noFormat = (defaultOptions.FOptions.numberFormat)? defaultOptions.FOptions.numberFormat: numberFormat;
+			var formatter = {
+				yAxis:{
+					labels:{
+						formatter: function(){
+							var formatted = F.Number.format(this.value, noFormat);
+							//console.log(this.value, noFormat,numberFormat, formatted);
+							return formatted;
+						}
+					}
+				}
+			}
+			defaultOptions = $.extend(true, {}, defaultOptions,formatter );
+		}
+
 		hc = new Highcharts.Chart(defaultOptions);
 	});
 	
 	
 	return{
-		chart: hc,
+		chart:function(){
+			return hc;
+		},
 		redraw: function(series, callback){
 			
 			var populate = function(series){
@@ -312,12 +362,6 @@ var FBar = function(container, options){
 			renderTo: container,
 			defaultSeriesType: 'bar'
         },
-	    legend:{
-			enabled:false
-	    },
-		credits:{
-			enabled: false
-		},
 		plotOptions: {
 			series: {
 				borderWidth: 0,
@@ -348,6 +392,9 @@ var FLine = function(container, options){
 		chart: {
 			renderTo: container,
 			defaultSeriesType: 'line'
+		},
+		FOptions:{
+			drawable: false
 		},
 		legend:{
 			enabled:false
@@ -383,10 +430,84 @@ var FLine = function(container, options){
 	
 	$.extend(true, defaultOptions, options);
 	
+	if(defaultOptions.FOptions.drawable){
+		$.extend(true, defaultOptions, {
+			chart:{
+				  events : {
+					load: function(e){
+						var chart = e.currentTarget;
+						var container = chart.container,
+						yValue = null;
+					
+						var getPoint = _.memoize(function(axis, e) {
+							//normalize for ie
+							var x = (e.chartX) ? e.chartX : e.x;
+							var y = (e.chartY) ? e.chartY : e.y;
+							var pc = axis.isXAxis ? 
+								x - chart.plotLeft : 
+								chart.plotHeight - y + chart.plotTop
+							var val = axis.translate(
+								 pc,
+								true
+							);
+							return val;
+						}, function(axis, e) {
+							var x = (e.chartX) ? e.chartX : e.x;
+							var y = (e.chartY) ? e.chartY : e.y;
+							return [axis.isXAxis ? 'x': 'y', x, y].join('_');
+						});
+					
+						var capture = function(e) {
+							if (e.originalEvent) {
+								e = e.originalEvent;
+							}
+							if(e.shiftKey) {
+								var series = _.first(chart.series);
+								yValue = Math.round(getPoint(series.yAxis, e) * 2) / 2;
+							}
+						};
+					
+						var move = function(e) {
+							if (e.originalEvent) {
+								e = e.originalEvent;
+							}
+							var isiPad = navigator.userAgent.match(/iPad/i) != null;
+							//Highcharts ismousedown doesn't work on ipads
+							if(!isiPad && !chart.mouseIsDown)
+								return false;
+					
+							var series = _.first(chart.series);
+							var x = Math.round(getPoint(series.xAxis, e)),
+							y = yValue !== null ? yValue : Math.round(getPoint(series.yAxis, e) * 2) / 2;
+							
+							if(series.data[x])
+								series.data[x].update(y, true, false);
+						};
+					
+						var drop = function(e) {
+							yValue = null;
+						};
+					
+						$(container)
+						.on('mousedown', capture)
+						.on('mousemove', move)
+						.on('mouseleave', drop)
+						.on("touchstart",capture)
+						.on("touchmove ", move)
+						.on("touchend ", drop)
+						
+						$(document).on('mouseup', drop);
+					}
+		          }
+			}
+		});
+	}
+	
 	//console.log("line options", defaultOptions)
 	var fc = new FChart(defaultOptions);
 	return fc;
 }
+
 
 var FPie = function(container, options){
 	var defaultOptions = {

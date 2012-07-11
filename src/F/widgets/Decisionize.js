@@ -25,20 +25,23 @@ F.Decisionize = (function(){
 				val = val.replace(/D_/i, "");
 				if(val.indexOf("=")!== -1) val = val.split("=")[0];
 				
-				var normalized = val.toLowerCase();
+				var normalized = $.trim(F.Template.compile(val.toLowerCase()));
 					
 				if(!valueElementList[normalized]){
 					valueElementList[normalized] = []
 				} 
 				valueElementList[normalized].push(elem);
-				queryList.push(val);
+				
+				if(!F.Array.contains(val, queryList))
+					queryList.push(val);
 			})
 		});
 		
 		//Get Data from Run API
 		F.API.Run.getValues(queryList, function(run){
 			$.each(run.values, function(key, value){
-				var listenersForThisVal = valueElementList[key];
+				//var listenersForThisVal = (valueElementList[key]) ? valueElementList[key] : [];
+				var listenersForThisVal = valueElementList[key]
 				//console.log("listenersForThisVal", listenersForThisVal, key, value);
 				
 				var formattedVal = (value.decisionFormatted) ? value.decisionFormatted : value.resultFormatted;
@@ -133,6 +136,9 @@ F.Decisionize = (function(){
 						
 							$(elem).trigger("change.d", {oldvalue:oldvalue}); //Let the client-side validation kick in
 						}
+						else if(type === "PARSE_ERROR"){
+							
+						}
 					})
 				}
 			}});
@@ -158,13 +164,22 @@ F.Decisionize = (function(){
 			var min = $elem.attr("min") || $elem.data("min");
 			var max = $elem.attr("max") || $elem.data("max");
 			
+			min = parseFloat(min);
+			max = parseFloat(max);
+			
 			var val = F.Number.extract($elem.val());
 			var prevData = (data && data.oldvalue)? data.oldvalue : $elem.data("valid");
-			if((min && val <= min) || (max && val >= max)){
+			
+			if(isNaN(val)){
+				$elem.val(prevData);
+				$elem.trigger("validationFailed", 
+					{value: val, type: "invalid-entry", text: "Invalid Entry. Please enter a Number."});
+			}
+			else if(((min || min === 0) && val < parseFloat(min)) || ((max || max === 0) && val > parseFloat(max))){
 				var msg, type;
 				$elem.val(prevData);
 				
-				if(min && val < min){
+				if((min || min === 0) && val < parseFloat(min)){
 					msg = "Please enter a value greater than " + min;
 					type = "min";
 				}
@@ -173,7 +188,7 @@ F.Decisionize = (function(){
 					type = "max";
 				}
 				
-				$elem.trigger("validationFailed",  {value: val, type: type, text: msg, min: min, max: max})
+				$elem.trigger("validationFailed",  {value: val, type: type, text: msg, min: min, max: max});
 			}
 			else{
 				save(this, prevData);
@@ -296,18 +311,29 @@ F.Decisionize = (function(){
 				selector+= " ";
 				
 				$(selector)
-					.off("click.d, blur.d,change.d,focus.d,modelChange.default", "*")
+					.off("click.d keyup.d blur.d change.d focus.d modelChange.default", "**")
 					.on("click.d", ":radio:dataModel", uiChangeHandler.base)
 					.on("blur.d", "textarea:dataModel", uiChangeHandler.base)
 					.on("change.d", ":checkbox:dataModel", uiChangeHandler.base)
 					.on("change.d", "select:dataModel", uiChangeHandler.base)
+					.on("keyup.d", ":text.autoformat", function(){
+						var format = $(this).data("format");
+						if(!format) return false;
+						
+						var formatted = F.Number.format(F.Number.extract($(this).val()), format);
+						if(formatted !== "?"){
+							$(this).val(formatted);
+						}
+					})
 					.on("change.d", "input[type='range']:dataModel", uiChangeHandler.base)
 					
 					.on("focus.d", ":text:dataModel,input[type='number']:dataModel", uiChangeHandler.textFocus)
-					.on("change.d", ":text:dataModel, input[type='number']:dataModel", uiChangeHandler.text)
+					.on("change.d", ":text:dataModel:not(.autoformat), input[type='number']:dataModel", uiChangeHandler.text)
+					.on("blur.d", ":text:dataModel.autoformat, input[type='number']:dataModel", uiChangeHandler.text)
 					
 					.on("modelChange.default", ":radio:dataModel,:checkbox:dataModel", modelChangeHandler.radio)
-					.on("modelChange.default", "textarea:dataModel, :text:dataModel, select:dataModel, input[type='number']:dataModel", modelChangeHandler.text)
+					.on("modelChange.default", "textarea:dataModel, :text:dataModel," +
+							"select:dataModel, input[type='number']:dataModel", modelChangeHandler.text)
 					.on("modelChange.default", ":dataModel:not(input,select,textarea)", modelChangeHandler.base)
 			})
 		}
