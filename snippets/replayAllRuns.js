@@ -1,19 +1,23 @@
 
 F.API.Auth.getUserInfo(function(data){
     F.API.UserGroup.getInfo(data.userGroup.name, function(user){
-        var userList = []
+        var userEmail = [];
+        var userList = [];
 		for(var i=0; i< user.group.users.length; i++){
 			if(!user.group.users[i].facilitator){
 				userList.push(user.group.users[i].path)
+				userEmail.push(user.group.users[i].email)
 			}
 		}
+		console.log(userList)
 		var startImpersonating = function(){
 			var firstUser = userList.pop();
+			var email = userEmail.pop();
 			console.log("Initializing " + firstUser + ". " + userList.length + " users remaining.");
 			if(firstUser){
 				
 				F.API.Auth.impersonate(firstUser, "", function(){
-					F.API.Archive.getRuns("saved=true&step=10&variables=$Fired^&facilitator=false", function(data){
+					F.API.Archive.getRuns("saved=true&variables=^$&facilitator=false&user_email="+email, function(blah,data){
 						var runs = []
 						for(var i=0; i< data.run.length; i++){
 							runs.push(data.run[i].runId)

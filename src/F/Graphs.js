@@ -388,6 +388,8 @@ var FBar = function(container, options){
 }
 
 var FLine = function(container, options){
+			var me = this;
+
 	var defaultOptions = {
 		chart: {
 			renderTo: container,
@@ -489,14 +491,19 @@ var FLine = function(container, options){
 						};
 					
 						$(container)
-						.on('mousedown', capture)
-						.on('mousemove', move)
-						.on('mouseleave', drop)
-						.on("touchstart",capture)
-						.on("touchmove ", move)
-						.on("touchend ", drop)
+						.on('mousedown.dlg touchstart.dlg', capture)
+						.on('mousemove.dlg touchmove.dlg', move)
+						.on('mouseleave.dlg touchend.dlg', drop)
 						
-						$(document).on('mouseup', drop);
+						chart.markReadonly = function(){
+							$(container)
+								.off('mousedown.dlg touchstart.dlg')
+								.off('mousemove.dlg touchmove.dlg')
+								.off('mouseleave.dlg touchend.dlg');
+								
+								$(document).off('mouseup.dlg');
+						}
+						
 					}
 		          }
 			}
@@ -505,6 +512,7 @@ var FLine = function(container, options){
 	
 	//console.log("line options", defaultOptions)
 	var fc = new FChart(defaultOptions);
+		
 	return fc;
 }
 

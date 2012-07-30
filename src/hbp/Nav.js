@@ -230,6 +230,9 @@ var Nav = function(){
 					})
 					.delegate("li.main", "click.navigate", function(evt){
 						var target = $(this).next().children("a:not('.nofollow')");
+						if(!target || !target.size()){
+							//target = $(this).find("a:not('.nofollow'):first");
+						}
 						target.trigger("click.navigate");
 					});
 			});
