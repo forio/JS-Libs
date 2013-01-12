@@ -11,19 +11,19 @@ _gaq.push(['_trackPageview']);
   ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
-				
-			
+
+
 var Nav = function(){
 	var History = YAHOO.util.History;
 
 	var startPage = "";
 	var module = 'page'; //Random name for the bookmarkmanager to use;
-	
+
 	var runParams = ""; //Stuff to post to run api on tab change
 	var pagePostParams = "";
-	
+
 	var loadCallback = $.noop;
-	
+
 	var pageNameFromLink = function($link){// Prettify name for url
 		var text = $link.data("title");
 		if(!text)
@@ -40,26 +40,26 @@ var Nav = function(){
 		});
 		return link;
 	}
-	
+
 	var UIstateChangeHandler =  function(page, postparams, options) {
 	 	//Has to be non-private as yui uses this
-			
+
 		var params = "";
 		if(page.indexOf("?") !== -1){
 			params = page.substr(page.indexOf("?"), page.length);
 			page = page.replace(params, "");
 		}
-		
+
 		var targetLink = linkFromPageName(page);
 		var targetHref = $(targetLink).attr("href") + params;
-		
+
 		$('#F_navigation li.selected').removeClass('selected');
 		var tabid = $(targetLink)
 						.parents("li")
 							.addClass('selected');
 		Nav.loadPage(targetHref, postparams, options);
 	}
-	
+
 	/** Taken from SWFObject's remove method **/
 	function removeSWF(obj) {
 		if(obj && F.isElement(obj)){
@@ -76,9 +76,9 @@ var Nav = function(){
 				setTimeout(arguments.callee, 10);
 			}
 		}
-		
+
 	}
-			
+
 	return{
 		/**
 		 * Switches page; Figures out which tab its in & switches to that.
@@ -92,7 +92,7 @@ var Nav = function(){
 			else{
 				pagePostParams = params;
 				loadCallback = (options) ? options.callback : $.noop;
-				
+
 				History.navigate(module, pageName);
 			}
 		},
@@ -105,7 +105,7 @@ var Nav = function(){
 		 */
 		loadPage:function(url,params, options){
 			(params) || (params = pagePostParams);
-			
+
 			var settings = {
 				target : "#content",
 				callback: loadCallback,
@@ -113,30 +113,31 @@ var Nav = function(){
 				flashCleanup: true
 			};
 			$.extend(settings, options);
-			
+
 			var page = $(settings.target);
-			
+
 			$("#loading_msg").show().find("p").html("Loading, please wait...");
 			//$(page)
 			//	.prepend("<div id='loadingMsg'><div><p>Loading</p><img src='img/loading_big.gif' alt='loading' /></div></div>")
-			
+
 			var ieSWFCleanup = function(){
 				//Function to clean up swfs to fix ie memory leak; Should return true or false
 				var ieObjects = $("object").get();
 				if(ieObjects.length > 0 && YAHOO.env.ua.ie && YAHOO.env.ua.ie < 9){
 					for(var i= 0; i < ieObjects.length; i++){
 						removeSWF(ieObjects[i]);
-				  	}
-				  	return false;
+					}
+					return false;
 				}
 				return true;
 			};
-			
+
 			var connsettings = {
 				onSuccess: function(data){
 					settings.callback();
 				},
 				onComplete: function(data){
+					$(Nav).trigger('preRender');
 					$("#loading_msg").hide();
 					$(page).html(data);
 				},
@@ -153,7 +154,7 @@ var Nav = function(){
 				preloadCondition: (settings.flashCleanup) ? ieSWFCleanup : function(){return true;}
 
 			}
-	
+
 			if(runParams){
 				var runURL = F.APIUtils.getURL("run");
 				//TODO: Combine pagePostParams as part of the url string for the return file;
@@ -169,7 +170,7 @@ var Nav = function(){
 			runParams = "";
 			pagePostParams = ""; 	// Because Yahoo refuses to pass params to bookmarked locns  use a global apram obj
 			loadCallback = $.noop;
-			
+
 		},
 		/** Refreshes the page only if the user is currently on it. Userful for multiplayer stuff.
 		 * @param {String} page
@@ -203,27 +204,27 @@ var Nav = function(){
 			YAHOO.util.Event.onDOMReady(function(){
 				//Check if there is a default start page specified
 				var $startPage = $("a#startPage").length > 0
-									? $("a#startPage") 
+									? $("a#startPage")
 									: $("#F_navigation li:not(.main):first a:first:not(.nofollow)");
 				startPage = pageNameFromLink($startPage);
-				
+
 				var bookmarkedState = History.getBookmarkedState(module);
 				var initialState = bookmarkedState || startPage;
-				
+
 				History.register(module, initialState, UIstateChangeHandler);
 				History.onReady(function(){UIstateChangeHandler(History.getCurrentState(module));});
 				History.initialize('yui-history-field', 'yui-history-iframe');
-				
+
 
 				$("#F_navigation")
 					.delegate(" li a:not('.nofollow')", "click.navigate", function(evt){
-						evt.preventDefault(); 
+						evt.preventDefault();
 						if ($(this).parent().hasClass('selected')) return;
 						var pageName = pageNameFromLink($(this))
 						History.navigate(module, pageName);
 					})
 					.delegate(" li a:not('.nofollow')", "click.analytics", function(evt){
-						evt.preventDefault(); 
+						evt.preventDefault();
 						var pageName = pageNameFromLink($(this))
    						_gaq.push(['_setAccount', ANALYTICS_CODE]);
        				    _gaq.push(['_trackPageview', "/" + F.APIUtils.simulatePath + "/" + F.APIUtils.userPath  + "/" + F.APIUtils.simPath + "/" + pageName]);
