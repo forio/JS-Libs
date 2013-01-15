@@ -51,6 +51,10 @@ var Nav = function(){
 		}
 		
 		var targetLink = linkFromPageName(page);
+		if(!targetLink){
+			throw new Error("Cannot find link for " + page);
+			return false;
+		}
 		var targetHref = $(targetLink).attr("href") + params;
 		
 		$('#F_navigation li.selected').removeClass('selected');
@@ -199,8 +203,33 @@ var Nav = function(){
 			}
 			return cp;
 		},
+		/** Hide links from DOM/ prevent navigation
+		 * @param {String} selector (optional) - links/lis to apply this to
+		 * @param {Object} useroptions (optional);
+		 * **/
+		disableLinks: function(selector,  useroptions){
+			selector || (selector = "*");
+			var $links = $("#F_navigation").find(selector);
+			var defaults = {
+				hide: true
+			}
+			var options = $.extend({}, defaults, useroptions);
+			
+			$links.addClass("nofollow");
+			if(options.hide) $links.hide();
+		},
+		/** Undo the effects of disableLinks
+		 * @param {String} selector (optional) - links/lis to apply this to
+		 * @param {Object} useroptions (optional);
+		 * **/
+		enableLinks: function(selector, options){
+			selector || (selector = "*");
+			var $links = $("#F_navigation").find(selector);
+			$links.find(".nofollow").removeClass("nofollow").show();
+			$links.filter(".nofollow").removeClass("nofollow").show();
+		},
 		init: function(){
-			YAHOO.util.Event.onDOMReady(function(){
+			$(function(){
 				//Check if there is a default start page specified
 				var $startPage = $("a#startPage").length > 0
 									? $("a#startPage") 
@@ -216,13 +245,16 @@ var Nav = function(){
 				
 
 				$("#F_navigation")
-					.delegate(" li a:not('.nofollow')", "click.navigate", function(evt){
+					.delegate("a", "click.default", function(evt){
+						evt.preventDefault();
+					})
+					.delegate(" li:not('.nofollow') a:not('.nofollow')", "click.navigate", function(evt){
 						evt.preventDefault(); 
 						if ($(this).parent().hasClass('selected')) return;
 						var pageName = pageNameFromLink($(this))
 						History.navigate(module, pageName);
 					})
-					.delegate(" li a:not('.nofollow')", "click.analytics", function(evt){
+					.delegate(" li:not('.nofollow') a:not('.nofollow')", "click.analytics", function(evt){
 						evt.preventDefault(); 
 						var pageName = pageNameFromLink($(this))
    						_gaq.push(['_setAccount', ANALYTICS_CODE]);
@@ -234,7 +266,8 @@ var Nav = function(){
 							//target = $(this).find("a:not('.nofollow'):first");
 						}
 						target.trigger("click.navigate");
-					});
+					})
+					.trigger("complete"); //Useful if you want to unbind link handlers
 			});
 		}()
 	};

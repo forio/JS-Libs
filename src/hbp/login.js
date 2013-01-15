@@ -83,6 +83,7 @@ YAHOO.util.Event.onDOMReady(function(){
 				});
 			}
 			else{
+				$("body").trigger("loginFailure", loginInfo.message);
 				if(document.getElementById("message")){
 					$("#message")
 						.text(loginInfo.message)

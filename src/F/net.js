@@ -156,6 +156,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 		var timeBetweenTries = 500;
 		
 		var timer;
+		//TODO: find away to defer this too
 		if(preLoadFn() !== true){ //Default fn returns true;
 			timer = setInterval (function(){
 				if(preLoadFn() === true){
@@ -165,7 +166,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 			}, timeBetweenTries);
 		}
 		else{
-			$.ajax(connSettings);
+			return $.ajax(connSettings);
 		}
 	}
 	return{
@@ -180,7 +181,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 				data: params
 			}
 			$.extend(defaults, options);
-			connect(defaults, callback);
+			return connect(defaults, callback);
 		},
 		/** GET but callback gets called with an object instead of a string
 		 * @param {*} params parameters to pass through
@@ -190,7 +191,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 		getJSON: function(params, callback, options){
 			var defaults = {dataType: "json"};
 			$.extend(defaults, options);
-			this.get(params, callback, options);
+			return this.get(params, callback, options);
 		},
 		/** GET but callback gets called with HTML. Use for navigation
 		 * @param {*} params parameters to pass through
@@ -204,7 +205,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 				data: params
 			}
 			$.extend(defaults, options);
-			connect(defaults, callback);
+			return connect(defaults, callback);
 		},
 		/** Ajax POST
 		 * @param {*} params parameters to pass through
@@ -217,7 +218,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 				data: params
 			}
 			$.extend(defaults, options);
-			connect(defaults, callback);
+			return connect(defaults, callback);
 		},
 		/** Rudimentary connection; Use if u need to override gets or posts; use 'data' for params and other standard Jquery options
 		 * @param {*} params parameters to pass through
@@ -225,7 +226,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 		 * @optional {Object} configuration options
 		 */
 		connect: function(options, callback){
-			connect(options, callback);
+			return connect(options, callback);
 		}
 	}
 }

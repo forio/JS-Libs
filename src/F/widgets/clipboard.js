@@ -61,7 +61,7 @@ var ClipBoard = {
         this.id = domId;
         $.extend(this._defaultDimensions, dimensions);
         var flashVars = $.extend({}, this._defaultSettings,settings );
-        swfobject.embedSWF(this._defaultSettings.swfPath, domId, this._defaultDimensions.width, this._defaultDimensions.height,
+        swfobject.embedSWF(flashVars.swfPath, domId, this._defaultDimensions.width, this._defaultDimensions.height,
                         '9.0.0','swf/expressInstall.swf', flashVars, this. _params);
     },
     copyTable: function(tableSelector){

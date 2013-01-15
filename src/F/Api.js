@@ -256,16 +256,17 @@ F.API.Data = (function(){
 		 * @param {*} options (optional)
 		 * 
 		 */
-		saveAs: function(key, value, callback, options, apioptions){
+		saveAs: function(key, value, callback, params, options){
 			if(!isKeyValid(key)){
 				throw new Error("Data.save: Invalid key " + key );
 			}
 			
-			var actualOptions = $.extend(true, {parameterParser: null}, apioptions)
-			var dataVal = getDataVal(value);
+			var actualOptions = $.extend(true, {parameterParser: null}, options)
+			var dataVal = (options && options.parameterParser === null) ? value: getDataVal(value);
+			
 			//UGH: simulate gotcha no.12312: What? You want case insensitive url params? surely you jest
 			var val =  "data_action=SETPROPERTY&value=" + dataVal;
-			var ac = new APIConnection(url(key), options, actualOptions);
+			var ac = new APIConnection(url(key), params, actualOptions);
 				ac.post(val, callback);
 		},
 		
@@ -577,6 +578,10 @@ F.API.Auth = (function(){
 			
 			var ac = new APIConnection(url, defaults.params, defaults);
 				ac.post(params , callback);
+		},
+		connect: function(params, callback, apioptions, connoptions){
+			var ac = new APIConnection(url, apioptions, connoptions);
+				ac.post(params, callback);
 		},
 		unimpersonate: function(callback, options){
 			var params = "user_action=unimpersonate";

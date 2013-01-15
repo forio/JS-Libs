@@ -122,17 +122,24 @@ F.GraphUtils = function(){
 					}
 		
 				}
-				else if(F.isObject(item) && item.y){
+				else if(F.isObject(item) && (item.y || item.y === 0)){
 					//Data was specified in "y" format
 					var itemClone = $.extend(true, {}, item);
 					var itemFormattedClone = $.extend(true, {}, item);
 					
-					var itemName = $.trim(F.Template.compile(itemClone.y).toLowerCase());
-					//var value = (runValues[itemName].result);
-					var value = (F.Number.extract(runValues[itemName].resultFormatted));
-					var valueFormatted =runValues[itemName].resultFormatted;
+					var value, valueFormatted;
+					if(F.isString(item.y)){
+						var itemName = $.trim(F.Template.compile(itemClone.y).toLowerCase());
+						value = (F.Number.extract(runValues[itemName].resultFormatted));
+						valueFormatted =runValues[itemName].resultFormatted;
 						
-					numberFormat = runValues[itemName].numberFormat;
+						numberFormat = runValues[itemName].numberFormat;
+					}
+					else{
+						value = item.y;
+						valueFormatted = item.y;
+					}
+					
 					
 					itemClone.y = value;
 					itemFormattedClone.y = valueFormatted;
