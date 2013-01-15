@@ -1,0 +1,56 @@
+#parse("includes/simvars.txt")
+
+#set($yrsToDisplay = 2)
+#set($totalYrs = $ReportYrs.size())
+#set($minIndex = $totalYrs - $yrsToDisplay)
+#set($isDataShortened = $totalYrs > $yrsToDisplay)
+#macro(TableReportRow $label $decision)
+	<tr>
+	<th>#if($label && $label != "") #_ToolTip("${decision}",  false, {}) #end $!label </th>
+	<td #if($isDataShortened) class="hidden" #end>  $!Values.get("$decision").getResultFormatted(0) </td>
+	#foreach($step in $ReportYrs)
+		#set($val = $Values.get("$decision").getResultFormatted($step))
+		#set($valActual = $Values.get("$decision").getResult($step))
+		
+		#set($style = "")
+		#if($foreachCount < $minIndex) 
+			#set($style = "hidden") 
+		#end
+		<td class="$style" #if($valActual < 0) style="color:red" #end >  $!val </td>
+	#end
+	</tr>
+#end
+
+#macro(Table $rowList)
+	<div class="tables">
+		<table id="results">
+			<thead>
+				<tr class="title_row">
+					<th class="nav"> 
+						<a href="#" class="prev #if(!$isDataShortened) invisible #end"> &laquo; Previous years </a>  
+						<a href="#" class="next invisible">  Next years &raquo;</a> </th>
+					<th #if($isDataShortened) class="hidden" #end> Start </th>
+					#foreach($step in $ReportYrs)
+						#set($cnt = ($step / 8) - 1)
+						#set($qtr = ($cnt % 4)+ 1) 
+						#set($yr = ($cnt / 4)+ 1) 
+						
+						#set($style = "")
+						#if($foreachCount < $minIndex) 
+                			#set($style = "hidden") 
+                		#end
+		
+						<th class="$style"> Y${yr}Q${qtr} </th>
+					#end
+				</tr>
+			</thead>
+			<tbody>
+				#foreach($item in $rowList)
+					#TableReportRow($item.get("label"), $item.get("var"))
+				#end
+			</tbody>
+		</table>
+			<p class="copyButton"><span id="copyThis"></span></p>
+
+	</div>
+#end
