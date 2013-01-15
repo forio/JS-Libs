@@ -141,6 +141,7 @@ var Nav = function(){
 					settings.callback();
 				},
 				onComplete: function(data){
+					$(Nav).trigger('preRender');
 					$("#loading_msg").hide();
 					$(page).html(data);
 				},
