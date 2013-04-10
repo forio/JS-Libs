@@ -161,7 +161,7 @@ var AjaxConnection = function(url, settings, ajaxOptions){
 			timer = setInterval (function(){
 				if(preLoadFn() === true){
 					clearInterval(timer);
-					$.ajax(connSettings);
+					return $.ajax(connSettings);
 				}
 			}, timeBetweenTries);
 		}

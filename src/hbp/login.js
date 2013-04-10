@@ -4,7 +4,7 @@ YAHOO.util.Event.onDOMReady(function(){
 		Dialogs.init("loginDialog");
 
 	}
-	
+
 	$('#forgotPassButton').click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
@@ -23,13 +23,13 @@ YAHOO.util.Event.onDOMReady(function(){
 			}
 		});
 	});
-	
+
 	$("#demoLoginSelect").change(function(){
 		if(this.value !== "other"){
 			$("#userName")
 				.hide();
 			var username =  $("#demoLoginSelect :selected").text();
-			
+
 			$("#txtUserName").val(username);
 			$("#txtPasswd").val($(this).val());
 		}
@@ -44,10 +44,11 @@ YAHOO.util.Event.onDOMReady(function(){
 		evt.preventDefault();
 		var userName = $("#txtUserName").val()
 		var passwd = $("#txtPasswd").val();
-		
+
 		F.API.Auth.login(userName, passwd, function(loginInfo){
-			if(loginInfo.canRunSim){ 
-				F.Net.goToURL("index.html");
+			if(loginInfo.canRunSim){
+                var location = window.location.href.replace('login.html', '');
+				window.location.href= location;
 			}
 			else if(loginInfo.userGroups && loginInfo.userGroups.length > 0){
 				var str = "<select id=\"group_selected\">";
@@ -57,11 +58,11 @@ YAHOO.util.Event.onDOMReady(function(){
 					if(group.description) var groupLabel = group.description + ", (" + group.name + ")";
 					else var groupLabel = group.name
 					str += "<option value=\""+group.name+"\">"+groupLabel+"</option>";
-				} 
+				}
 				str += "</select><p style=\"padding-top:12px;\"><input class=\"leave_group\" type=\"submit\" value=\"&laquo; Log out\" /><input class=\"join_group\" style=\"float: right;\" type=\"submit\" value=\"Log in &raquo;\" /></p>";
 				var dialogHeader = "Choose the code for your class and section:";
-				
-				Dialogs.show(str,null,{ 
+
+				Dialogs.show(str,null,{
 					icon: "",
 					width: "340px",
 					header: dialogHeader,
@@ -77,7 +78,7 @@ YAHOO.util.Event.onDOMReady(function(){
 				});
 				$(".leave_group").click(function(e){
 					e.preventDefault();
-					F.API.Auth.logout(function(){ 
+					F.API.Auth.logout(function(){
 						F.Net.goToURL("login.html");
 					});
 				});

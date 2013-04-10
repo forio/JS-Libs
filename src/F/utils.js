@@ -549,7 +549,7 @@ F.Number = {
             var suffix = (fixesTXT.length > 1) ? fixesTXT[1].toString() : '';
 
             number = number * ((formatTXT.split('%').length > 1) ? 100 : 1);
-            if(formatTXT.indexOf("%") !== -1) number = number * 100;
+//            if(formatTXT.indexOf("%") !== -1) number = number * 100;
             number = roundTo(number, decimals);
 
             sign = (number == 0) ? '' : sign;

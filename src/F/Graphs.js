@@ -5,10 +5,10 @@ F.GraphUtils = function(){
 		}
 		$.extend(defaults, options);
 		var variableList= [];
-		
+
 		for(var i=0; i<series.length; i++){
 			var thisseries = series[i];
-			
+
 			for(var j=0; j< thisseries.data.length; j++){
 				var item = thisseries.data[j];
 				if(F.isString(item) && !F.Array.contains(item, variableList)){
@@ -18,12 +18,12 @@ F.GraphUtils = function(){
 				else if(F.isObject(item) && F.isString(item.y) && !F.Array.contains(item.y, variableList)){
 					var templatedName = (defaults.compile) ? F.Template.compile(item.y): item.y;
 					variableList.push(templatedName);
-				}				
+				}
 			}
 		}
 		return variableList;
 	}
-	
+
 	var getDataForSeries = function(variableList, callback, options){
 		var useArchive= (options && options.archiveParams);
 
@@ -33,14 +33,14 @@ F.GraphUtils = function(){
 		else{
 			var type = "concise";
 			for(var i=0; i< variableList.length; i++){
-				variableList[i] = variableList[i].toLowerCase(); 
+				variableList[i] = variableList[i].toLowerCase();
 				if(variableList[i].indexOf(".result") !== -1){
 					//Extract stuff within brackets
 					//var index = variableList[i].toLowerCase().replace(/.*.result\(|\)/gi,'');
 					variableList[i]= variableList[i].substr(0,variableList[i].indexOf(".result"));
 				}
 			}
-			
+
 			if(useArchive){
 				F.API.Archive.getRuns(options.archiveParams, function(runs){
 					if(runs.length){
@@ -55,95 +55,95 @@ F.GraphUtils = function(){
 					callback(runValues) ;
 				}, {format: "runtime"});
 			}
-			
+
 		}
 	}
-	
+
 	var unifySeriesData = function(runValues, ipSeries, callback, options){
 		var series = F.Array.copy(ipSeries);
 		var useResultFormatted = (options && options.plotResultFormatted);
-		
+
 		var numberFormat = "";
 		//console.log("unifySeriesData", runValues, ipSeries, options, useResultFormatted)
 		for(var i=0; i<series.length; i++){
 			var thisseries = series[i];
 				thisseries.dataFormatted = [];
-			
+
 			var dataArray = [];
 			var dataFormattedArray = [];
-			
+
 			for(var j=0; j< thisseries.data.length; j++){
 				var item = thisseries.data[j];
 				var index = j;
 				if(F.isString(item)){
 					var itemName = $.trim(F.Template.compile(item).toLowerCase());
 					//TODO: make ', ' same as ',' to allow errors in specifying name
-					
+
 					var pattern = /(.*).(Result|Decision)\((.*)\)/i;
 					var match = pattern.exec(itemName);
 					if(match){
 						var actualVarName = match[1];
 						var isResult = (match[2] === "result");
 						var range = match[3]; // ... or 1..3
-						
+
 						var results = runValues[actualVarName].results; //TODO: Also split for .decision
 						numberFormat =runValues[actualVarName].numberFormat;
-						
+
 						if(range){
 							var first = range.charAt(0);
 							var max = range.length -1;
 							var last = range.charAt(max);
-							
+
 							var startIndex = (first === ".") ? 0 : parseInt(first);
 							var endIndex = (last === ".") ? results.length : last;
-							
+
 							results = results.slice(startIndex, endIndex);
 						}
-						
+
 						var kindex = 0;
 						for(var k=0; k< results.length; k++){
 							kindex++;
 							index = j+kindex;
 							//dataArray.push(parseFloat(results[k].result));
 							var val = (!useResultFormatted) ? parseFloat(results[k].result) : F.Number.extract(results[k].resultFormatted);
-							
-							
+
+
 							dataArray.push(val);
 							dataFormattedArray.push(results[k].resultFormatted);
 						}
 					}
 					else{
 						//Just a regular variable name
-						
+
 						var val = (!useResultFormatted) ? parseFloat(runValues[itemName].result) : F.Number.extract(runValues[itemName].resultFormatted);
 						dataArray[index] =  val;
 						numberFormat = runValues[itemName].numberFormat;
 						dataFormattedArray[index] = runValues[itemName].resultFormatted;
 					}
-		
+
 				}
 				else if(F.isObject(item) && (item.y || item.y === 0)){
 					//Data was specified in "y" format
 					var itemClone = $.extend(true, {}, item);
 					var itemFormattedClone = $.extend(true, {}, item);
-					
+
 					var value, valueFormatted;
 					if(F.isString(item.y)){
 						var itemName = $.trim(F.Template.compile(itemClone.y).toLowerCase());
 						value = (F.Number.extract(runValues[itemName].resultFormatted));
 						valueFormatted =runValues[itemName].resultFormatted;
-						
+
 						numberFormat = runValues[itemName].numberFormat;
 					}
 					else{
 						value = item.y;
 						valueFormatted = item.y;
 					}
-					
-					
+
+
 					itemClone.y = value;
 					itemFormattedClone.y = valueFormatted;
-					
+
 					dataArray[index] = itemClone;
 					dataFormattedArray[index] = itemFormattedClone;
 				}
@@ -154,18 +154,18 @@ F.GraphUtils = function(){
 					throw new Error("unknown data format to unifySeriesData", item)
 				}
 			}
-			
+
 			//console.log("fina", dataArray, dataFormattedArray)
 			thisseries.data = dataArray;
 			thisseries.dataFormatted = dataFormattedArray;
 			thisseries.numberFormat = numberFormat;
-			
+
 			series[i] = thisseries;
 		}
 		//console.log(ipSeries, series, numberFormat, "unify")
 		return {series: series, numberFormat: numberFormat};
 	}
-	
+
 	return{
 		populateSeries: function(series, callback, options){
 			var variableList = getSeriesVariables(series);
@@ -212,12 +212,12 @@ var FChart = function(options){
 		  series: []
 	}
 	$.extend(true, defaultOptions, options);
-	
+
 	isDataURL = (defaultOptions.seriesURL) ? true: false;
-	
+
 	var defaultseries = F.Array.copy(defaultOptions.series);
 	var model = $.extend(true, [], defaultseries);
-	
+
 	function draw(callback){
 		if(isDataURL){
 			var ac = new AjaxConnection(defaultOptions.seriesURL);
@@ -230,10 +230,10 @@ var FChart = function(options){
 			F.GraphUtils.populateSeries(model, callback,defaultOptions.FOptions);
 		}
 	}
-	
+
 	draw(function(series, numberFormat){
 		defaultOptions.series = series;
-		
+
 		var format = defaultOptions.FOptions.numberFormat;
 		if(format !== "auto"){
 			var noFormat = (defaultOptions.FOptions.numberFormat)? defaultOptions.FOptions.numberFormat: numberFormat;
@@ -253,14 +253,14 @@ var FChart = function(options){
 
 		hc = new Highcharts.Chart(defaultOptions);
 	});
-	
-	
+
+
 	return{
 		chart:function(){
 			return hc;
 		},
 		redraw: function(series, callback){
-			
+
 			var populate = function(series){
 				var dirty = false;
 				for(var i=0; i< series.length; i++){
@@ -275,15 +275,15 @@ var FChart = function(options){
 					hc.redraw();
 				}
 			}
-			
+
 			if(!series){
 				draw(populate);
 			}
 			else{
 				populate(series);
 			}
-			
-			
+
+
 		},
 		getModel: function(){
 			var cleanedModel = F.GraphUtils.getSeriesVariables(model, {compile: false});
@@ -302,7 +302,7 @@ var FChart = function(options){
 			//console.log(dSet)
 		},
 		update: function(changedValues){
-			
+
 		}
 	}
 }
@@ -317,21 +317,21 @@ var FStackedColumn = function(container, options){
 			enabled:false
 	    },
 		xAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		},
 		yAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		}
-		
+
 	}
 	$.extend(true, defaultOptions, options);
-	
+
 	var fc = new FChart(defaultOptions);
 	return fc;
 }
@@ -347,21 +347,21 @@ var FArea= function(container, options){
 	          stacking: 'normal',
 	          linewidth: 0
 	        },
-	         series: { 
-              marker: { 
-                enabled: false, 
-                radius: 0 
+	         series: {
+              marker: {
+                enabled: false,
+                radius: 0
               },
               lineWidth: 0
             }
 		}
 	}
 	$.extend(true, defaultOptions, options);
-	
+
 	//console.log("area", defaultOptions)
 	var fc = new FChart(defaultOptions);
 	return fc;
-	
+
 }
 var FBar = function(container, options){
 	var defaultOptions = {
@@ -376,20 +376,20 @@ var FBar = function(container, options){
 			}
 		},
 		xAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		},
 		yAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		}
 	}
 	$.extend(true, defaultOptions, options);
-	
+
 	var fc = new FChart(defaultOptions);
 	return fc;
 }
@@ -412,13 +412,13 @@ var FLine = function(container, options){
 			enabled: false
 		},
 		xAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		},
 		yAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
@@ -433,12 +433,12 @@ var FLine = function(container, options){
 		          radius: 2,
 		          symbol: "circle"
 		      }
-		  }  
-		}		
+		  }
+		}
 	}
-	
+
 	$.extend(true, defaultOptions, options);
-	
+
 	if(defaultOptions.FOptions.drawable){
 		$.extend(true, defaultOptions, {
 			chart:{
@@ -447,13 +447,13 @@ var FLine = function(container, options){
 						var chart = e.currentTarget;
 						var container = chart.container,
 						yValue = null;
-					
+
 						var getPoint = _.memoize(function(axis, e) {
 							//normalize for ie
 							var x = (e.chartX) ? e.chartX : e.x;
 							var y = (e.chartY) ? e.chartY : e.y;
-							var pc = axis.isXAxis ? 
-								x - chart.plotLeft : 
+							var pc = axis.isXAxis ?
+								x - chart.plotLeft :
 								chart.plotHeight - y + chart.plotTop
 							var val = axis.translate(
 								 pc,
@@ -465,7 +465,7 @@ var FLine = function(container, options){
 							var y = (e.chartY) ? e.chartY : e.y;
 							return [axis.isXAxis ? 'x': 'y', x, y].join('_');
 						});
-					
+
 						var capture = function(e) {
 							if (e.originalEvent) {
 								e = e.originalEvent;
@@ -475,7 +475,7 @@ var FLine = function(container, options){
 								yValue = Math.round(getPoint(series.yAxis, e) * 2) / 2;
 							}
 						};
-					
+
 						var move = function(e) {
 							if (e.originalEvent) {
 								e = e.originalEvent;
@@ -484,42 +484,42 @@ var FLine = function(container, options){
 							//Highcharts ismousedown doesn't work on ipads
 							if(!isiPad && !chart.mouseIsDown)
 								return false;
-					
+
 							var series = _.first(chart.series);
 							var x = Math.round(getPoint(series.xAxis, e)),
 							y = yValue !== null ? yValue : Math.round(getPoint(series.yAxis, e) * 2) / 2;
-							
+
 							if(series.data[x])
 								series.data[x].update(y, true, false);
 						};
-					
+
 						var drop = function(e) {
 							yValue = null;
 						};
-					
+
 						$(container)
 						.on('mousedown.dlg touchstart.dlg', capture)
 						.on('mousemove.dlg touchmove.dlg', move)
 						.on('mouseleave.dlg touchend.dlg', drop)
-						
+
 						chart.markReadonly = function(){
 							$(container)
 								.off('mousedown.dlg touchstart.dlg')
 								.off('mousemove.dlg touchmove.dlg')
 								.off('mouseleave.dlg touchend.dlg');
-								
+
 								$(document).off('mouseup.dlg');
 						}
-						
+
 					}
 		          }
 			}
 		});
 	}
-	
+
 	//console.log("line options", defaultOptions)
 	var fc = new FChart(defaultOptions);
-		
+
 	return fc;
 }
 
@@ -537,20 +537,91 @@ var FPie = function(container, options){
 			enabled: false
 		},
 		xAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		},
 		yAxis:{
-			lineColor: '#ababab', 
+			lineColor: '#ababab',
 			lineWidth: 1,
 			gridLineColor:'#FFFFFF',
 			tickWidth: 0
 		}
 	}
 	$.extend(true, defaultOptions, options);
-	
+
 	var fc = new FChart(defaultOptions);
 	return fc;
 }
+
+
+var FHistogram  = function(container, metric, histogramOptions,options){
+        var defaultOptions = {
+            title: {text: metric},
+            chart: {
+                defaultSeriesType: "column",
+                borderColor: "#CCC",
+                borderWidth: 2,
+                height: 200,
+                marginTop: 50,
+                borderRadius: 0
+            },
+            tooltip: {
+                formatter: function () {
+                    return this.y + (this.y != 1 ? " runs" : " run");
+                }
+            },
+            series: [{
+            }],
+            yAxis: {
+                endOnTick: true,
+                title: {
+                    text: "runs",
+                    style: {
+                        color: "#666"
+                    }
+                }
+            }
+        }
+        $.extend(defaultOptions, options);
+         var filter = {
+            format: "HISTOGRAM",
+            variables: "^" + metric + "$",
+            score: metric,
+            userBest: "false",
+            facilitator: "false",
+            saved: "false"
+        };
+        $.extend(filter, histogramOptions)
+
+
+       F.API.Archive.getRuns(filter, function(data, response){
+            var categories = [];
+            var histogram = response && response.histogram || {};
+            var bars = histogram.bars || [];
+            var seriesData = [];
+
+            for (i = 0, len = bars.length; i < len; i++) {
+                var bar = bars[i];
+                seriesData.push(parseFloat(bar.value) || 0);
+                if(bar.max == 0)
+                    bar.maxFormatted = bar.minFormatted;
+                categories.push((bar.adjustedMinFormatted || 0) + " to " + (bar.maxFormatted || 0));
+            }
+
+            $.extend(defaultOptions, {
+                series: [{
+                    data: seriesData,
+                    color: "#2B8D9D"
+                }],
+                xAxis: {
+                    categories: categories
+                }
+            });
+
+            var fc = new FBar(container, defaultOptions);
+
+       });
+
+  }
