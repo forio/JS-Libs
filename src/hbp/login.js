@@ -48,7 +48,7 @@ YAHOO.util.Event.onDOMReady(function(){
 		F.API.Auth.login(userName, passwd, function(loginInfo){
 			if(loginInfo.canRunSim){
                 var location = window.location.href.replace('login.html', '');
-				window.location.href= location;
+                window.location.assign(location);
 			}
 			else if(loginInfo.userGroups && loginInfo.userGroups.length > 0){
 				var str = "<select id=\"group_selected\">";
