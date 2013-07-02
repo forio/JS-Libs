@@ -1,7 +1,6 @@
-/**  Archive API operations. 
- *  See http://sites.google.com/a/forio.com/documentation/api-documentation/api-archive for list of supported params
+/**  Usergroup API operations.
  *  @static
- *  @class Archive
+ *  @class UserGroup
  *  @namespace F.API
  */
 F.API.UserGroup = (function(){
@@ -14,7 +13,7 @@ F.API.UserGroup = (function(){
 				}
 			}
 			var ac = new APIConnection(url);
-			
+
 			var params = {
 				action: "addUsers",
 				content: userList
@@ -22,17 +21,17 @@ F.API.UserGroup = (function(){
 			$.extend(params, options);
 			ac.post(params , callback); //Dry run to see if there are any errors
 		},
-		
+
 		setPermission:function(filter , callback, options){
 			var ac = new APIConnection(url, options);
 				ac.getJSON(filter , callback);
 		},
-		
+
 		setRunLimit: function(){
-			
+
 		},
 		clearRunCount: function(){
-			
+
 		},
 		/** Email lost passwords. For use by admins
 		 * @param {String} loginid login of user to retreive for
@@ -44,19 +43,19 @@ F.API.UserGroup = (function(){
 			var ac = new APIConnection(url, options);
 				ac.post(qs , callback);
 		},
-		
+
 		setRoles: function(group, roles, callback, options){
 			var qs = "action=setRoles&value=" + roles;
 			var ac = new APIConnection(url +"/" + group, options);
 				ac.post(qs , callback);
 		},
-		
+
 		doActions: function(actions, params, callback, options){
 			var actionsQs= {
 				"action" : [].concat(actions)
 			}
 			var qs = $.extend(actions, F.makeObject(params));
-			
+
 			var ac = new APIConnection(url, options);
 				ac.post(qs, callback);
 		}
@@ -86,7 +85,7 @@ F.API.Email = (function(){
 			var ac = new APIConnection(url, options);
 				ac.post(qs, callback);
 		},
-		
+
 		sendFile: function(to, subject, filepath, callback, options){
 			var qs = {to: to, subject: subject, file: filepath};
 			var ac = new APIConnection(url, options);
