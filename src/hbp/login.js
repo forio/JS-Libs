@@ -1,5 +1,5 @@
 
-YAHOO.util.Event.onDOMReady(function(){
+$(document).ready(function(){
 	if(document.getElementById("loginDialog")){
 		Dialogs.init("loginDialog");
 
