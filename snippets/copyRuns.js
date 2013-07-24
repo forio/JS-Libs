@@ -3,7 +3,7 @@ GROUP_TO_COPY_FROM = "harvardtest";
 SIM_TO_COPY_TO = "/harvard/innovation-demo";
 GROUP_TO_COPY_TO = "default";
 
-F.API.Archive.getRuns("saved=true&step=10&variables=$Fired^&facilitator=false&group_name=" + GROUP_TO_COPY_FROM, function(pretty, data){
+F.API.Archive.getRuns("saved=true&variables=$^&facilitator=false&group_name=" + GROUP_TO_COPY_FROM, function(pretty, data){
 	var runs = [];
 	var users = [];
 	for(var i=0; i< data.run.length; i++){

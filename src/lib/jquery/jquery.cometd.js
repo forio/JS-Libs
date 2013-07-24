@@ -4,7 +4,7 @@
  */
 (function($) {
 	// Remap cometd JSON functions to jquery JSON functions
-	org.cometd.JSON.toJSON = YAHOO.lang.JSON.stringify;
+	org.cometd.JSON.toJSON = JSON.stringify;
 	org.cometd.JSON.fromJSON = $.parseJSON;
 
 	function _setHeaders(xhr, headers) {

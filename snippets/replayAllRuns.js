@@ -1,6 +1,8 @@
 
-F.API.Auth.getUserInfo(function(data){
-    F.API.UserGroup.getInfo(data.userGroup.name, function(user){
+// F.API.Auth.getUserInfo(function(data){
+    var USER_GROUP = "";
+    // var USER_GROUP = data.userGroup.name;
+    F.API.UserGroup.getInfo(USER_GROUP, function(user){
         var userEmail = [];
         var userList = [];
 		for(var i=0; i< user.group.users.length; i++){
@@ -15,14 +17,14 @@ F.API.Auth.getUserInfo(function(data){
 			var email = userEmail.pop();
 			console.log("Initializing " + firstUser + ". " + userList.length + " users remaining.");
 			if(firstUser){
-				
+
 				F.API.Auth.impersonate(firstUser, "", function(){
 					F.API.Archive.getRuns("saved=true&variables=^$&facilitator=false&user_email="+email, function(blah,data){
 						var runs = []
 						for(var i=0; i< data.run.length; i++){
 							runs.push(data.run[i].runId)
 						}
-						
+
 						console.log("found",runs.length, "runs" );
 						var start = function(){
 							var firstRun = runs.pop();
@@ -49,4 +51,4 @@ F.API.Auth.getUserInfo(function(data){
 		}
 		F.API.UserGroup.resetRunLimit(null,startImpersonating)
 	})
-})
+// })
