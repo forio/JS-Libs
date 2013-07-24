@@ -332,7 +332,7 @@ F.Decisionize = (function(){
 
                     .on("focus.d", ":text:dataModel,input[type='number']:dataModel", uiChangeHandler.textFocus)
                     .on("change.d", ":text:dataModel:not(.autoformat), input[type='number']:dataModel", uiChangeHandler.text)
-                    .on("blur.d", ":text:dataModel.autoformat, input[type='number']:dataModel", uiChangeHandler.text)
+                    .on("blur.d", ":text:dataModel.autoformat, input[type='number']:dataModel, input[type='hidden']:dataModel", uiChangeHandler.text)
 
                     .on("modelChange.default", ":radio:dataModel,:checkbox:dataModel", modelChangeHandler.radio)
                     .on("modelChange.default", "textarea:dataModel, :text:dataModel," +
