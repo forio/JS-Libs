@@ -40,7 +40,7 @@ $(document).ready(function(){
 					.val("");
 		}
 	})
-	$("#btnLogin").click(function(evt){
+	$("#login, form:has(#btnLogin)").submit(function(evt){
 		evt.preventDefault();
 		var userName = $("#txtUserName").val()
 		var passwd = $("#txtPasswd").val();
