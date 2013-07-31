@@ -15,6 +15,9 @@ F.API.UserGroup = (function(){
 		 * @param {Object} group
 		 */
 		add:function(userList, callback,  options, group){
+
+			userList = userList.replace(/"/g,''); // double-quotes for Team names will break javascript
+
 			var newurl =  (group) ?  url + "/" + group:  url;
 			var defaults = {
 				onError: function(status, message){
