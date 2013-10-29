@@ -552,7 +552,7 @@ F.API.Auth = (function(){
 		 * @return {}
 		 */
 		login: function(email,password,callback, options){
-			var params = "user_action=login&email=" + encodeURIComponent(email) + "&password=" + password;
+			var params = "user_action=login&email=" + encodeURIComponent(email) + "&password=" + encodeURIComponent(password);
 
 			var defaults = {
 				parameterParser: null,
