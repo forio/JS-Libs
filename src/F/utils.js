@@ -142,11 +142,7 @@ var F = function(){
 				paramList = [].concat(paramList);
 			}
 			else if(F.isObject(paramList)){
-                if (defaults.encode !== false) {
-                    return $.param(paramList);
-                } else {
-                    paramList = F.Object.toArray(paramList, defaults);
-                }
+				paramList = F.Object.toArray(paramList, defaults);
 			}
 			else if(F.isString(paramList)){
 				if(defaults.encode !== false)
