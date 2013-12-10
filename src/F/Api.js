@@ -350,6 +350,25 @@ F.API.Run = (function(){
 		return variableList;
 	}
 
+	var encodeObjectValues = function(object) {
+		var encoded = {};
+		$.each(object, function (key, prop) {
+			encoded[key] = encodeURIComponent(prop);
+		});
+		return encoded;
+	};
+
+	var decodeQueryStringElements = function(elements, separator) {
+		separator = separator || "=";
+		var decoded = [];
+		$.each(elements, function (idx, element) {
+			var parts = element.split(separator);
+			parts[1] = decodeURIComponent(parts[1]);
+			decoded[idx] = parts.join(separator);
+		});
+		return decoded;
+	};
+
 	return {
 		prettifyValsArray: prettifyValsArray,
 		/** Save Decisions
@@ -368,10 +387,23 @@ F.API.Run = (function(){
 		 * @param {Object} options (optional)
 		 */
 		setProperties:function(properties, callback, options, apioptions){
+			// Overcoming a bug in the make() function that does not play well with &
+			// even if turning the encode flag on, so we first encode the values of the
+			// properties, it assumes we receive an object with { key:value } format
+			properties = encodeObjectValues(properties);
+			// the makeQuery string will build a query string with the format "key:value&key2:value2"
 			properties = F.makeQueryString(properties, {seperator: ":", encode: false});
+			
 			var propQs= {
 				"run_set" : properties.split("&")
 			}
+			// We generate the final query string "run_set=key:value&run_set=key2:value2"
+			propQs = F.makeQueryString(propQs, { encode: false});
+
+			// Disable the parameterParser as it runs the makeQueryString with the enable flag set to true
+			// and it encodes the already encoded & (%26)
+			apioptions = apioptions || {};
+			$.extend(apioptions, { parameterParser: null });
 			var ac = new APIConnection(url, options, apioptions);
 			return ac.post(propQs, callback);
 		},
@@ -552,7 +584,7 @@ F.API.Auth = (function(){
 		 * @return {}
 		 */
 		login: function(email,password,callback, options){
-			var params = "user_action=login&email=" + encodeURIComponent(email) + "&password=" + password;
+			var params = "user_action=login&email=" + encodeURIComponent(email) + "&password=" + encodeURIComponent(password);
 
 			var defaults = {
 				parameterParser: null,
