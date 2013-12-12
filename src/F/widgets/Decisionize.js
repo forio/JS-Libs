@@ -194,6 +194,8 @@ F.Decisionize = (function(){
                 $elem.trigger("validationFailed",  {value: val, type: type, text: msg, min: min, max: max});
             }
             else{
+                // put the 'clean' value into the element, so the save actually works
+                $elem.val(val);
                 save(this, prevData);
                 $elem.data("valid", $elem.val());
             }
