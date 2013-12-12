@@ -40,6 +40,7 @@ function replayRuns(runsByUser, groupId) {
         var user = users.pop();
 
         if (user) {
+            console.log('trying for user ' + user + ' on gr ' + groupId);
             F.API.Auth.impersonate(user, groupId, function() {
                 var run_count = 0;
                 var run_total = runsByUser[user].length;
@@ -78,7 +79,7 @@ function replayRuns(runsByUser, groupId) {
     nextUser();
 }
 
-F.API.Archive.getRuns('', function (r) { runs = r; }, { format: 'concise', variables: [], facilitator: false });
+F.API.Archive.getRuns('', function (r) { runs = r.run; }, { format: 'concise', variables: [], facilitator: false });
 
 byUser = {};
 
