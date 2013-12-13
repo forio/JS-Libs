@@ -194,6 +194,8 @@ F.Decisionize = (function(){
                 $elem.trigger("validationFailed",  {value: val, type: type, text: msg, min: min, max: max});
             }
             else{
+                // put the 'clean' value into the element, so the save actually works
+                $elem.val(val);
                 save(this, prevData);
                 $elem.data("valid", $elem.val());
             }
@@ -344,7 +346,7 @@ F.Decisionize = (function(){
                     .on("modelChange.default", "textarea:dataModel, :text:dataModel," +
                             "select:dataModel, input[type='number']:dataModel", modelChangeHandler.text)
                     .on("modelChange.default", "input[type='hidden']:dataModel", modelChangeHandler.hidden)
-                    .on("modelChange.default", ":dataModel:not(input,select,textarea)", modelChangeHandler.base)
+                    .on("modelChange.default", ":dataModel:not(input,select,textarea)", modelChangeHandler.base);
             });
         }
     };
