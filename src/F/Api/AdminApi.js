@@ -1,4 +1,4 @@
-/**  Archive API operations. 
+/**  Archive API operations.
  *  See http://sites.google.com/a/forio.com/documentation/api-documentation/api-archive for list of supported params
  *  @static
  *  @class Archive
@@ -22,7 +22,7 @@ F.API.UserGroup = (function(){
 				}
 			}
 			var ac = new APIConnection(newurl);
-			
+
 			var params = {
 				action: "addUsers",
 				content: userList
@@ -36,7 +36,7 @@ F.API.UserGroup = (function(){
 				action: "removeUsers",
 				user: userList
 			}
-			
+
 			var ac = new APIConnection(newurl, options);
 				ac.post(params , callback);
 		},
@@ -44,7 +44,7 @@ F.API.UserGroup = (function(){
 			var ac = new APIConnection(url, options);
 				ac.getJSON(filter , callback);
 		},
-		
+
 		/**
 		 * @param {Object} grpName
 		 * @param {Object} params : description/singleSignOnOnly/allowUpload
@@ -53,25 +53,25 @@ F.API.UserGroup = (function(){
 		 */
 		createGroup: function(grpName, params, callback, options){
 			var newurl =   url + "/" + grpName;
-			
+
 			var defaultParams = {
 				method: "PUT"
 			}
 			$.extend(defaultParams, params);
-			
+
 			var defaultOptions = {
 				onError: function(response){
-					
+
 				}
 			}
 			$.extend(defaultOptions, options);
-			
+
 			var ac = new APIConnection(newurl, "", defaultOptions);
 				ac.post(defaultParams , callback);
 		},
 		getInfo: function(grpName, callback, options, apioptions){
 			grpName || (grpName = "")
-			
+
 			var ac = new APIConnection(url + "/" + grpName, options, apioptions);
 				ac.getJSON("" , callback);
 		},
@@ -80,7 +80,7 @@ F.API.UserGroup = (function(){
 			//no action
 			var ac = new APIConnection(url + "/" + grpName + "/" + targetUser, options);
 				ac.post(params , callback);
-			
+
 		},
 		resetRunLimit: function(runLimit, callback, options){
 			var qs = "action=clearRunCount";
@@ -94,13 +94,13 @@ F.API.UserGroup = (function(){
 			var ac = new APIConnection(url, options);
 				ac.post(qs , callback);
 		},
-		
+
 		setRunLimit: function(runLimit, callback, options){
 			var qs = "action=setRunLimit&value=" + runLimit;
 			var ac = new APIConnection(url, options);
 				ac.post(qs , callback);
 		},
-		
+
 		/** Email lost passwords. For use by admins
 		 * @param {String} loginid login of user to retreive for
 		 * @param {Function} callback function (optional)
@@ -111,7 +111,7 @@ F.API.UserGroup = (function(){
 			var ac = new APIConnection(url, options);
 				ac.post(qs , callback);
 		},
-		
+
 		setRoles: function(group, roles, callback, options){
 			var qs = "action=setRoles&value=" + roles;
 			var ac = new APIConnection(url +"/" + group, options);
@@ -122,7 +122,7 @@ F.API.UserGroup = (function(){
 				"action" : [].concat(actions)
 			}
 			var qs = $.extend(actionsQs, F.makeObject(params));
-			
+
 			var ac = new APIConnection(url, options);
 				ac.post(qs, callback);
 		}
@@ -134,7 +134,7 @@ F.API.User = (function(){
 	var url = F.APIUtils.getNonSimURL("user");
 	return{
 		/**
-		 *   
+		 *
 		    * firstName
 		    * lastName
 		    * organizationName  (optional)
@@ -160,15 +160,15 @@ F.API.User = (function(){
 			$.extend(defaults, params);
 
 			var qs = F.makeQueryString(defaults);
-			
+
 			var defaultOptions ={
 				parameterParser: null
 			}
 			$.extend(defaultOptions, options);
-			
+
 			var ac = new APIConnection(url, "", defaultOptions);
 				ac.post(qs , callback);
-			
+
 		}
 	}
 }());
@@ -192,10 +192,10 @@ F.API.Email = (function(){
 	return{
 		send: function(to, subject, body, callback, options){
 			var qs = {to: to, subject: subject, body: body};
-			var ac = new APIConnection("http://forio.com/simulate/api/email", options);
+			var ac = new APIConnection(url, options);
 				ac.post(qs, callback);
 		},
-		
+
 		sendFile: function(to, subject, filepath, callback, options){
 			var qs = {to: to, subject: subject, file: filepath};
 			var ac = new APIConnection(url, options);

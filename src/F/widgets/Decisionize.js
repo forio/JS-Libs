@@ -260,6 +260,9 @@ F.Decisionize = (function(){
                                 case "text":
                                     $(elem).val(getFormattedVal(params.value));
                                     break;
+                                case "hidden":
+                                    $(elem).val(getFormattedVal(params.value)).trigger("change.decisionize");
+                                    break;
                                 default:
                                     $(elem).text(getFormattedVal(params.value));
                             }
@@ -289,14 +292,17 @@ F.Decisionize = (function(){
                         }
                     }
 
-                })
-            }
+                });
+            };
         return{
             radio: function(event, params){
-                actionHandler(this, "radio", params)
+                actionHandler(this, "radio", params);
             },
             text: function(event, params){
-                actionHandler(this, "text", params)
+                actionHandler(this, "text", params);
+            },
+            hidden: function(event, params){
+                actionHandler(this, "hidden", params);
             },
             base: function(event, params){
                 actionHandler(this, "base", params);
@@ -332,13 +338,14 @@ F.Decisionize = (function(){
 
                     .on("focus.d", ":text:dataModel,input[type='number']:dataModel", uiChangeHandler.textFocus)
                     .on("change.d", ":text:dataModel:not(.autoformat), input[type='number']:dataModel", uiChangeHandler.text)
-                    .on("blur.d", ":text:dataModel.autoformat, input[type='number']:dataModel, input[type='hidden']:dataModel", uiChangeHandler.text)
+                    .on("blur.d", ":text:dataModel.autoformat, input[type='number']:dataModel", uiChangeHandler.text)
 
                     .on("modelChange.default", ":radio:dataModel,:checkbox:dataModel", modelChangeHandler.radio)
                     .on("modelChange.default", "textarea:dataModel, :text:dataModel," +
                             "select:dataModel, input[type='number']:dataModel", modelChangeHandler.text)
+                    .on("modelChange.default", "input[type='hidden']:dataModel", modelChangeHandler.hidden)
                     .on("modelChange.default", ":dataModel:not(input,select,textarea)", modelChangeHandler.base)
-            })
+            });
         }
-    }
-}())
+    };
+}());
