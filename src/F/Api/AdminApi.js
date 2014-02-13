@@ -15,18 +15,28 @@ F.API.UserGroup = (function(){
 		 * @param {Object} group
 		 */
 		add:function(userList, callback,  options, group){
-			var newurl =  (group) ?  url + "/" + group:  url;
+			var newurl =  (group) ?  url + "/" + group: url;
 			var defaults = {
 				onError: function(status, message){
-					callback(message);
-				}
+					// Errors come with different parameters
+					if(status.status && status.message) {
+						callback(status.message, status.status); 
+					}
+					else {
+						callback(message, status);	
+					}
+				},
+				parameterParser: $.param
 			}
-			var ac = new APIConnection(newurl);
+			// force APIConnection to use jQuery paramter parser instead of its own
+			// since it is more robust to handle special characters in names, passwords, etc.
+			var ac = new APIConnection(newurl, null, defaults);
 
 			var params = {
 				action: "addUsers",
 				content: userList
-			}
+			};
+
 			$.extend(params, options);
 			ac.post(params , callback); //Dry run to see if there are any errors
 		},
@@ -38,11 +48,11 @@ F.API.UserGroup = (function(){
 			}
 
 			var ac = new APIConnection(newurl, options);
-				ac.post(params , callback);
+			ac.post(params , callback);
 		},
 		setPermission:function(filter , callback, options){
 			var ac = new APIConnection(url, options);
-				ac.getJSON(filter , callback);
+			ac.getJSON(filter , callback);
 		},
 
 		/**

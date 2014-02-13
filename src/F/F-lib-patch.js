@@ -8,10 +8,21 @@
 
         F.API.UserGroup.add = function(userList, callback,  options, group){
             var newurl =  (group) ?  userGroupUrl + "/" + group: userGroupUrl;
-
+            var defaults = {
+                onError: function(status, message){
+                    // Errors come with different parameters
+                    if(status.status && status.message) {
+                        callback(status.message, status.status); 
+                    }
+                    else {
+                        callback(message, status);  
+                    }
+                },
+                parameterParser: $.param
+            }
             // force APIConnection to use jQuery paramter parser instead of its own
             // since it is more robust to handle special characters in names, passwords, etc.
-            var ac = new APIConnection(newurl, null, { parameterParser: $.param });
+            var ac = new APIConnection(newurl, null, defaults);
 
             var params = {
                 action: "addUsers",
