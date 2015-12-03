@@ -32,6 +32,7 @@
 						async : packet.sync !== true,
 						type : 'POST',
 						contentType : 'application/json;charset=UTF-8',
+                                                 xhrFields:{withCredentials: true},
 						data : packet.body,
 						beforeSend : function(xhr) {
 							_setHeaders(xhr, packet.headers);
@@ -79,12 +80,10 @@
 		return that;
 	};
 
-	/** Nrn: HAH, breaks chrome
 	if (window.WebSocket) {
 		$.cometd.registerTransport('websocket',
 				new org.cometd.WebSocketTransport());
 	}
-	**/
 	$.cometd.registerTransport('long-polling',
 			new $.cometd.LongPollingTransport());
 	$.cometd.registerTransport('callback-polling',
